@@ -2,6 +2,8 @@
 
 本文档用于在一台新机器上安装并启用 `marketplace-zxgc`。它不会同步任何凭据、token、cookie、私钥或机器专属配置。
 
+推荐优先使用仓库根目录的中文自动化安装手册：[`操作指导.md`](../操作指导.md)。该手册以 `scripts/install-marketplace-zxgc.sh` 为主入口，把注册、刷新插件缓存、同步 skills、安装 AGENTS/rules/hooks、清理废弃 skill 和 smoke test 串成一个可 dry-run 的流程。
+
 ## 作用
 
 `marketplace-zxgc` 是一个本地优先的 Codex 能力包，用来把常用的用户级 Codex 能力集中维护和分发：
