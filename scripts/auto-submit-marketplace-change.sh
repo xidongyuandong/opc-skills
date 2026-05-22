@@ -8,6 +8,8 @@ PROJECT_URL="https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git"
 TITLE=""
 ISSUE_TITLE=""
 ISSUE_DESCRIPTION=""
+MR_IID=""
+ISSUE_IID=""
 BRANCH=""
 COMMIT_MESSAGE=""
 APPLY=0
@@ -26,6 +28,8 @@ Options:
   --title TEXT                Human-readable change title. Used for branch, commit, issue, and MR.
   --issue-title TEXT          GitLab issue title. Defaults to --title.
   --issue-description TEXT    GitLab issue description.
+  --mr-iid IID                Update an existing GitLab MR.
+  --issue-iid IID             Reuse/update an existing GitLab issue.
   --branch NAME               Source branch. Defaults to content-based branch inference.
   --commit-message TEXT       Commit message. Defaults to inferred conventional message.
   --exclude PATH              Exclude a changed path from this automated submission. Repeatable.
@@ -101,6 +105,36 @@ filter_files() {
   done
 }
 
+run_gitlab_mr() {
+  local source_branch="$1"
+  local mr_title="$2"
+  local issue_title="$3"
+  local issue_description="$4"
+  local mr_cmd=(
+    python3 "$ROOT/plugins/marketplace-zxgc/skills/code-refactor/scripts/gitlab_auto_mr.py"
+    --project-url "$PROJECT_URL"
+    --source-branch "$source_branch"
+    --target-branch "$TARGET_BRANCH"
+    --mr-title "$mr_title"
+    --issue-title "$issue_title"
+    --issue-description "$issue_description"
+  )
+  if [ -n "$MR_IID" ]; then
+    mr_cmd+=(--mr-iid "$MR_IID")
+  fi
+  if [ -n "$ISSUE_IID" ]; then
+    mr_cmd+=(--issue-iid "$ISSUE_IID")
+  fi
+
+  if [ "$APPLY" -eq 1 ]; then
+    "${mr_cmd[@]}"
+  else
+    printf '+'
+    printf ' %q' "${mr_cmd[@]}"
+    printf '\n'
+  fi
+}
+
 infer_branch() {
   local files="$1"
   local title_slug
@@ -173,6 +207,14 @@ while [ "$#" -gt 0 ]; do
       ISSUE_DESCRIPTION="${2:-}"
       shift 2
       ;;
+    --mr-iid)
+      MR_IID="${2:-}"
+      shift 2
+      ;;
+    --issue-iid)
+      ISSUE_IID="${2:-}"
+      shift 2
+      ;;
     --branch)
       BRANCH="${2:-}"
       shift 2
@@ -229,6 +271,23 @@ fi
 
 files="$(changed_files | filter_files)"
 if [ -z "$files" ]; then
+  if [ -n "$MR_IID" ] || [ -n "$ISSUE_IID" ]; then
+    if [ -z "$BRANCH" ]; then
+      BRANCH="$(git branch --show-current)"
+    fi
+    if [ -z "$TITLE" ]; then
+      TITLE="update marketplace MR"
+    fi
+    if [ -z "$ISSUE_TITLE" ]; then
+      ISSUE_TITLE="$TITLE"
+    fi
+    if [ -z "$ISSUE_DESCRIPTION" ]; then
+      ISSUE_DESCRIPTION="Automated marketplace-zxgc MR metadata update."
+    fi
+    echo "No marketplace file changes after exclusions; updating GitLab issue/MR metadata only."
+    run_gitlab_mr "$BRANCH" "$TITLE" "$ISSUE_TITLE" "$ISSUE_DESCRIPTION"
+    exit 0
+  fi
   echo "No marketplace changes to submit after exclusions."
   exit 0
 fi
@@ -307,20 +366,4 @@ else
   run git push -u "$REMOTE" "$BRANCH"
 fi
 
-mr_cmd=(
-  python3 "$ROOT/plugins/marketplace-zxgc/skills/code-refactor/scripts/gitlab_auto_mr.py"
-  --project-url "$PROJECT_URL"
-  --source-branch "$BRANCH"
-  --target-branch "$TARGET_BRANCH"
-  --mr-title "$TITLE"
-  --issue-title "$ISSUE_TITLE"
-  --issue-description "$ISSUE_DESCRIPTION"
-)
-
-if [ "$APPLY" -eq 1 ]; then
-  "${mr_cmd[@]}"
-else
-  printf '+'
-  printf ' %q' "${mr_cmd[@]}"
-  printf '\n'
-fi
+run_gitlab_mr "$BRANCH" "$TITLE" "$ISSUE_TITLE" "$ISSUE_DESCRIPTION"
