@@ -271,10 +271,35 @@ fi
 
 files="$(changed_files | filter_files)"
 if [ -z "$files" ]; then
-  if [ -n "$MR_IID" ] || [ -n "$ISSUE_IID" ]; then
-    if [ -z "$BRANCH" ]; then
-      BRANCH="$(git branch --show-current)"
+  if [ -z "$BRANCH" ]; then
+    BRANCH="$(git branch --show-current)"
+  fi
+  if git rev-parse --verify "$REMOTE/$TARGET_BRANCH" >/dev/null 2>&1 &&
+      [ -n "$(git log --oneline "$REMOTE/$TARGET_BRANCH..HEAD")" ]; then
+    if [ -z "$TITLE" ]; then
+      TITLE="submit existing marketplace commits"
     fi
+    if [ -z "$ISSUE_TITLE" ]; then
+      ISSUE_TITLE="$TITLE"
+    fi
+    if [ -z "$ISSUE_DESCRIPTION" ]; then
+      ISSUE_DESCRIPTION="Automated marketplace-zxgc submission for existing commits on $BRANCH.
+
+Commits:
+$(git log --oneline "$REMOTE/$TARGET_BRANCH..HEAD" | sed 's/^/- /')"
+    fi
+    echo "No file changes after exclusions; submitting existing commits on $BRANCH."
+    if [ -n "${GITLAB_TOKEN:-}" ]; then
+      export GITLAB_PUSH_TOKEN="$GITLAB_TOKEN"
+      helper='!f() { echo username=oauth2; echo password=$GITLAB_PUSH_TOKEN; }; f'
+      run git -c credential.helper="$helper" push -u "$REMOTE" "$BRANCH"
+    else
+      run git push -u "$REMOTE" "$BRANCH"
+    fi
+    run_gitlab_mr "$BRANCH" "$TITLE" "$ISSUE_TITLE" "$ISSUE_DESCRIPTION"
+    exit 0
+  fi
+  if [ -n "$MR_IID" ] || [ -n "$ISSUE_IID" ]; then
     if [ -z "$TITLE" ]; then
       TITLE="update marketplace MR"
     fi
