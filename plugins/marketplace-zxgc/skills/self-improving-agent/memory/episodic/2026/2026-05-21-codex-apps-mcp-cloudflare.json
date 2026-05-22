@@ -1,0 +1,28 @@
+{
+  "id": "ep-2026-05-21-001",
+  "timestamp": "2026-05-21T00:00:00+08:00",
+  "skill": "self-improving-agent",
+  "situation": "User asked why the built-in codex_apps MCP client failed to start while handshaking with https://chatgpt.com/backend-api/wham/apps.",
+  "outcome": "A reusable troubleshooting rule was extracted for remote MCP failures where the MCP client expects JSON/SSE but receives HTML challenge content or transport errors.",
+  "root_cause": "Most likely proxy/VPN exit IP reputation or Codex GUI proxy inheritance caused chatgpt.com backend requests to receive a Cloudflare HTML challenge page; stale Codex auth remained a secondary possibility.",
+  "evidence": [
+    "Shell curl HEAD reached the endpoint and returned 405 Allow: POST, proving basic reachability.",
+    "Unauthenticated initialize POST returned 401 Unauthorized, proving the endpoint requires auth rather than being absent.",
+    "Codex logs showed 403 Forbidden HTML challenge content and Unexpected content type text/html during MCP initialize.",
+    "The local config did not show a user-defined codex_apps MCP entry, indicating this was likely an internal Codex remote MCP rather than a malformed local config stanza."
+  ],
+  "solution": [
+    "Switch proxy node and verify chatgpt.com browser login.",
+    "Set macOS GUI proxy environment with launchctl setenv for HTTP_PROXY, HTTPS_PROXY, ALL_PROXY, and NO_PROXY.",
+    "Fully restart Codex so the GUI process inherits the proxy environment.",
+    "Run codex login or re-login in the app if auth remains suspect.",
+    "Avoid changing local MCP config unless logs prove a local config problem."
+  ],
+  "lesson": "For remote MCP startup failures, first classify the response path as reachability, auth, challenge HTML, timeout, or local config before proposing fixes.",
+  "related_pattern": "codex_remote_mcp_html_challenge_triage",
+  "user_feedback": {
+    "request": "Persist the failure cause as a reusable rule",
+    "rating": null,
+    "comments": null
+  }
+}

@@ -1,0 +1,3 @@
+display_name: Codex Remote Container
+short_description: Configure and operate Codex in remote Docker containers.
+default_prompt: Help me connect Codex to a remote Docker/devcontainer, sync required Codex state, and validate remote execution.

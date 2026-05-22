@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex SSH Remote Config"
+  short_description: "Configure Codex SSH remotes safely."
+  default_prompt: "Help me configure a Codex SSH remote. Guide the manual steps and run the safe checks."
