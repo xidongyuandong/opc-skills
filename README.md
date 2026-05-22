@@ -97,6 +97,15 @@ The initial pack includes:
 - `codex-hook`
 - `codex-remote-container`
 - `codex-ssh-remote-config`
+- `algorithm-engineer-workflow`
+- `algorithm-data-diagnosis`
+- `algorithm-tensorboard-analysis`
+- `algorithm-training-debug`
+- `algorithm-training-review`
+- `algorithm-rl-debug`
+- `algorithm-eval-diagnosis`
+- `algorithm-eval-closure`
+- `algorithm-agent-trace-analysis`
 - `task2zxgc`
 
 `task2zxgc` is kept marketplace-local as the single source of truth. It is not synced into `~/.codex/skills` by default.

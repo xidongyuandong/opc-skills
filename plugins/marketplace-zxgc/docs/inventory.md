@@ -11,6 +11,8 @@
 - `code-refactor`: automated helper commands for autocommit, autofix, autosummary, autodoc, autointerpret, and auto-merge-request workflows.
 - `codex-hooks` and `codex-hook`: hook configuration workflows.
 - `codex-remote-container` and `codex-ssh-remote-config`: remote Codex/container workflows.
+- `algorithm-engineer-workflow`: top-level algorithm engineering workflow for ML data, training, evaluation, TensorBoard, RL, and agent trace work.
+- `algorithm-data-diagnosis`, `algorithm-tensorboard-analysis`, `algorithm-training-debug`, `algorithm-training-review`, `algorithm-rl-debug`, `algorithm-eval-diagnosis`, `algorithm-eval-closure`, and `algorithm-agent-trace-analysis`: focused algorithm engineering diagnosis and review skills.
 - `task2zxgc`: task export workflow.
 
 ### Templates

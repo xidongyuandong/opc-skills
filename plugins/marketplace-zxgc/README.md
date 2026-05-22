@@ -53,6 +53,18 @@ Apply:
 
 `code-refactor` is included in the default sync set with its `commands/` references so each subcommand can load the required procedure file.
 
+The algorithm engineering skill set is included in the default sync set:
+
+- `algorithm-engineer-workflow`
+- `algorithm-data-diagnosis`
+- `algorithm-tensorboard-analysis`
+- `algorithm-training-debug`
+- `algorithm-training-review`
+- `algorithm-rl-debug`
+- `algorithm-eval-diagnosis`
+- `algorithm-eval-closure`
+- `algorithm-agent-trace-analysis`
+
 `task2zxgc` is intentionally excluded from the default sync set so the marketplace copy remains the only maintained copy.
 
 Existing skills are backed up under `$CODEX_HOME/backups/skills/<timestamp>/` before replacement. Backups are intentionally kept outside `$CODEX_HOME/skills` so old skill copies are not rediscovered as active skills.
