@@ -17,13 +17,43 @@ from typing import Any
 
 
 HOME = Path.home()
-CODEX_HOME = Path(os.environ.get("CODEX_HOME", HOME / ".codex"))
+
+
+def env_first(*names: str, default: str = "") -> str:
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value
+    return default
+
+
+def path_from_env(*names: str, default: Path) -> Path:
+    return Path(env_first(*names, default=str(default))).expanduser()
+
+
+def repo_dir_name(repo_url: str) -> str:
+    cleaned = repo_url.rstrip("/")
+    if not cleaned:
+        return "task2zxgc-reports"
+    name = cleaned.rsplit("/", 1)[-1]
+    if name.endswith(".git"):
+        name = name[:-4]
+    name = re.sub(r"[^\w.\-\u4e00-\u9fff]+", "-", name.strip(), flags=re.UNICODE)
+    name = re.sub(r"-+", "-", name).strip("-._")
+    return name[:80] or "task2zxgc-reports"
+
+
+DEFAULT_REPO_URL = env_first(
+    "TASK2ZXGC_REPO_URL",
+    "TASK2ZXGC_GIT_REPO",
+    default="https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git",
+)
+CODEX_HOME = path_from_env("TASK2ZXGC_CODEX_HOME", "CODEX_HOME", default=HOME / ".codex")
 SESSIONS_DIR = CODEX_HOME / "sessions"
-STATE_DIR = CODEX_HOME / "task2zxgc"
+STATE_DIR = path_from_env("TASK2ZXGC_STATE_DIR", default=CODEX_HOME / "task2zxgc")
 PENDING_FILE = STATE_DIR / "pending.json"
-DEFAULT_REPO_URL = "https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git"
-DEFAULT_REPO_DIR = STATE_DIR / "ai-coding-zxgc-managment"
-DEFAULT_AI_INSIGHTS_REPO = Path(os.environ.get("AI_INSIGHTS_REPO", str(HOME / "ai-insights")))
+DEFAULT_REPO_DIR = path_from_env("TASK2ZXGC_REPO_DIR", default=STATE_DIR / repo_dir_name(DEFAULT_REPO_URL))
+DEFAULT_AI_INSIGHTS_REPO = path_from_env("AI_INSIGHTS_REPO", default=HOME / "ai-insights")
 
 
 @dataclass
@@ -53,7 +83,20 @@ def sanitize_path_part(value: str, fallback: str) -> str:
     return cleaned[:80] or fallback
 
 
+def display_path(path: Path) -> str:
+    expanded = path.expanduser()
+    for base, label in ((CODEX_HOME, "$CODEX_HOME"), (HOME, "$HOME")):
+        try:
+            return str(Path(label) / expanded.relative_to(base.expanduser()))
+        except ValueError:
+            continue
+    return str(expanded)
+
+
 def username() -> str:
+    configured = env_first("TASK2ZXGC_USERNAME", "TASK2ZXGC_AUTHOR")
+    if configured:
+        return sanitize_path_part(configured, "unknown")
     try:
         result = run(["git", "config", "--get", "user.name"], check=False)
         if result.returncode == 0 and result.stdout.strip():
@@ -228,7 +271,7 @@ def evidence(summary: SessionSummary) -> list[str]:
 
 def ai_insights_reference(repo_dir: Path = DEFAULT_AI_INSIGHTS_REPO) -> dict[str, Any]:
     return {
-        "source_repo": str(repo_dir),
+        "source_repo": display_path(repo_dir),
         "purpose": "ai-insights 将 AI 编程会话解析为结构化 facets、prompt quality、friction、outcome 和 evidence sidecar，用于报告、评估和复核。",
         "reference_points": [
             "按单次会话提取 semantic facets，再聚合成跨会话报告；task2zxgc 可借鉴为单任务报告提供稳定诊断维度。",
@@ -256,7 +299,7 @@ def ai_insights_reference(repo_dir: Path = DEFAULT_AI_INSIGHTS_REPO) -> dict[str
 def session_context(summary: SessionSummary, ai_insights_repo: Path = DEFAULT_AI_INSIGHTS_REPO) -> dict[str, Any]:
     return {
         "session_id": summary.session_id,
-        "session_path": str(summary.session_path),
+        "session_path": display_path(summary.session_path),
         "user_messages": user_messages(summary),
         "assistant_final_messages": summary.assistant_finals,
         "tool_event_samples": summary.tool_events[-20:],
@@ -386,7 +429,7 @@ def render_markdown(
 - username: {user}
 - datetime: {date_text}
 - session: {session_ref}
-- source_session: {summary.session_path}
+- source_session: {display_path(summary.session_path)}
 - target_repo: {repo_url}
 
 ## 任务主题
@@ -485,6 +528,8 @@ def request_posthook(args: argparse.Namespace) -> None:
         "repo_url": args.repo_url,
         "repo_dir": str(Path(args.repo_dir).expanduser()),
     }
+    if args.username:
+        marker["username"] = args.username
     if args.agent_summary_file:
         marker["agent_summary_file"] = str(Path(args.agent_summary_file).expanduser())
     PENDING_FILE.write_text(json.dumps(marker, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -497,6 +542,7 @@ def main() -> int:
     parser.add_argument("--session-id", help="Codex session id substring to resolve under ~/.codex/sessions.")
     parser.add_argument("--repo-url", default=DEFAULT_REPO_URL)
     parser.add_argument("--repo-dir", default=str(DEFAULT_REPO_DIR))
+    parser.add_argument("--username", help="Output namespace under the report repository. Defaults to TASK2ZXGC_USERNAME, git user.name, or OS user.")
     parser.add_argument("--ai-insights-repo", default=str(DEFAULT_AI_INSIGHTS_REPO), help="Path to ai-insights repo used as diagnostic reference.")
     parser.add_argument("--dry-run", action="store_true", help="Render the report to stdout without cloning, committing, or pushing.")
     parser.add_argument("--push", action="store_true", help="Clone/pull the target repo, write the report, commit, and push.")
@@ -527,7 +573,7 @@ def main() -> int:
     agent_summary = load_agent_summary(args)
     if args.push and not agent_summary and not args.allow_fallback_summary:
         raise SystemExit("Refusing to push without Agent-generated summary. Use --agent-summary-file/--agent-summary-json/--agent-summary-stdin.")
-    user = username()
+    user = sanitize_path_part(args.username, "unknown") if args.username else username()
     now = datetime.now()
     rendered_reports = [render_markdown(summary, user, now, args.repo_url, report) for report in agent_reports(agent_summary)]
 

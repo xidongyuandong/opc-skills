@@ -8,15 +8,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 
 HOME = Path.home()
-CODEX_HOME = Path.home() / ".codex"
+CODEX_HOME = Path(
+    os.environ.get("TASK2ZXGC_CODEX_HOME") or os.environ.get("CODEX_HOME") or str(HOME / ".codex")
+).expanduser()
+STATE_DIR = Path(os.environ.get("TASK2ZXGC_STATE_DIR") or str(CODEX_HOME / "task2zxgc")).expanduser()
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
-PENDING_FILE = CODEX_HOME / "task2zxgc" / "pending.json"
+PENDING_FILE = STATE_DIR / "pending.json"
 PLUGIN_SCRIPT = PLUGIN_ROOT / "skills" / "task2zxgc" / "scripts" / "task2zxgc.py"
 INSTALLED_SCRIPT = CODEX_HOME / "skills" / "task2zxgc" / "scripts" / "task2zxgc.py"
 
@@ -47,6 +51,7 @@ def main() -> int:
     session_id = pending.get("session_id")
     repo_url = pending.get("repo_url")
     repo_dir = pending.get("repo_dir")
+    username = pending.get("username")
     agent_summary_file = pending.get("agent_summary_file")
     if session_path:
         cmd.extend(["--session", str(session_path)])
@@ -56,10 +61,15 @@ def main() -> int:
         cmd.extend(["--repo-url", str(repo_url)])
     if repo_dir:
         cmd.extend(["--repo-dir", str(repo_dir)])
+    if username:
+        cmd.extend(["--username", str(username)])
     if agent_summary_file:
         cmd.extend(["--agent-summary-file", str(agent_summary_file)])
 
-    result = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    env = os.environ.copy()
+    env.setdefault("CODEX_HOME", str(CODEX_HOME))
+    env.setdefault("TASK2ZXGC_STATE_DIR", str(STATE_DIR))
+    result = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     if result.stdout:
         sys.stdout.write(result.stdout)
     if result.stderr:

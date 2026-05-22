@@ -1,6 +1,6 @@
 ---
 name: task2zxgc
-description: Summarize the current Codex session into a task report and push it to the ai-coding-zxgc-managment GitLab repository.
+description: Summarize the current Codex session into a task report and push it to a configured task report Git repository.
 metadata:
   version: 1.1.0
 ---
@@ -11,13 +11,19 @@ Use this skill when the user runs `/task2zxgc` or asks to export the current Cod
 
 ## Behavior
 
-The skill generates a Markdown report from the current full Codex session and pushes it to:
+The skill generates a Markdown report from the current full Codex session and pushes it to the configured task report repository.
+
+Default target repository:
 
 `https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git`
+
+Override it on other machines with `TASK2ZXGC_REPO_URL` or `--repo-url`.
 
 The output path in that repository is:
 
 `{username}/{YYYY-MM-DD-HH}-{task-title}.md`
+
+`username` defaults to `TASK2ZXGC_USERNAME`, then `TASK2ZXGC_AUTHOR`, then `git config user.name`, then OS user. Use `--username` for a one-off override.
 
 The report includes:
 
@@ -46,7 +52,8 @@ Topic split rules:
 When the user invokes `/task2zxgc`, use the Agent-based flow. First dump the session context:
 
 ```bash
-python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --dump-context
+TASK2ZXGC_SCRIPT="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --dump-context
 ```
 
 Then, as the Codex Agent, synthesize a JSON object. For a single-topic session, use this shape:
@@ -120,7 +127,8 @@ Use `$AI_INSIGHTS_REPO` as the diagnostic reference. Its useful patterns for thi
 Finally push with the Agent-generated summary:
 
 ```bash
-python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --push --agent-summary-file /path/to/agent-summary.json
+TASK2ZXGC_SCRIPT="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /path/to/agent-summary.json
 ```
 
 When the JSON contains `reports`, the script renders every report and commits all generated Markdown files together.
@@ -130,21 +138,47 @@ Do not run `--push` without an Agent summary. The script refuses that by default
 For validation without GitLab side effects, run:
 
 ```bash
-python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --dry-run --agent-summary-file /path/to/agent-summary.json
+TASK2ZXGC_SCRIPT="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --dry-run --agent-summary-file /path/to/agent-summary.json
 ```
+
+## Team Configuration
+
+Use environment variables for machine-specific configuration. Do not commit credentials or absolute local paths into this skill.
+
+- `CODEX_HOME`: Codex home used to find sessions; defaults to `$HOME/.codex`.
+- `TASK2ZXGC_CODEX_HOME`: task2zxgc-specific override for Codex home.
+- `TASK2ZXGC_STATE_DIR`: pending marker and cloned report repo state; defaults to `$CODEX_HOME/task2zxgc`.
+- `TASK2ZXGC_REPO_URL`: target report repository URL; overrides the built-in default.
+- `TASK2ZXGC_REPO_DIR`: local clone directory for the target report repository.
+- `TASK2ZXGC_USERNAME` / `TASK2ZXGC_AUTHOR`: output namespace under the report repository.
+- `AI_INSIGHTS_REPO`: optional diagnostic reference repository; defaults to `$HOME/ai-insights`.
+
+Example:
+
+```bash
+export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+export MARKETPLACE_ZXGC_HOME="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}"
+export TASK2ZXGC_REPO_URL="https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git"
+export TASK2ZXGC_REPO_DIR="$CODEX_HOME/task2zxgc/ai-coding-zxgc-managment"
+export TASK2ZXGC_USERNAME="$(git config user.name 2>/dev/null || whoami)"
+```
+
+GitLab authentication must come from the user's Git credential helper, SSH key, or local environment. Never put tokens in the repository URL inside committed files.
 
 ## Posthook Mode
 
 The Codex `Stop` hook is configured to call:
 
 ```bash
-python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/hooks/task2zxgc_posthook.py --event Stop
+python3 "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/hooks/task2zxgc_posthook.py" --event Stop
 ```
 
 The posthook is intentionally idle by default. It only pushes when a pending marker exists, which can be created with:
 
 ```bash
-python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --request-posthook --agent-summary-file /path/to/agent-summary.json
+TASK2ZXGC_SCRIPT="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --request-posthook --agent-summary-file /path/to/agent-summary.json
 ```
 
 This prevents every session stop from creating a Git commit.
