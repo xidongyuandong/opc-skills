@@ -16,6 +16,7 @@ Create and manage a review-ready GitLab merge request from a local repository, i
 - Prefer HTTPS GitLab remotes with `git credential fill`.
 - A completed MR must be `opened`, not Draft/WIP, have a pushed source branch, and have a related issue.
 - `approve` does not close issues. GitLab closes issues after merge when the MR description or commit message contains `Closes #N`, `Fixes #N`, or `Resolves #N`.
+- Target the GitLab project default branch by default. If a requested target branch is not the project default branch, stop and explain that issue auto-close may not run unless the user explicitly accepts a non-default target.
 - For multiple repositories or worktrees, complete the full checklist per path. Do not count a worktree as done until its intended branch has committed changes, an upstream remote branch, and a matching MR.
 - Preserve unrelated user changes. Stage only files intended for the requested MR.
 
@@ -54,15 +55,15 @@ Create and manage a review-ready GitLab merge request from a local repository, i
 5. Use the helper script for GitLab API operations:
    ```bash
    python3 <skill-dir>/scripts/gitlab_auto_mr.py \
-     --target-branch <target-branch> \
      --issue-title "<issue title>" \
      --issue-description "<issue body>"
    ```
 
+   Pass `--target-branch <target-branch>` only when the requested target is explicit. The helper defaults to the GitLab project default branch and rejects non-default targets unless `--allow-non-default-target` is provided.
+
    Reuse existing objects when appropriate:
    ```bash
    python3 <skill-dir>/scripts/gitlab_auto_mr.py \
-     --target-branch <target-branch> \
      --issue-iid <issue-iid> \
      --mr-iid <mr-iid> \
      --issue-title "<issue title>" \
@@ -76,6 +77,7 @@ Create and manage a review-ready GitLab merge request from a local repository, i
    - `detailed_merge_status` is acceptable or reported as a blocker.
    - `related_merge_requests` contains the MR.
    - MR description includes both a readable issue title and `Closes #N`.
+   - `target_branch` equals `default_branch` unless a non-default target was explicitly accepted.
    - `warnings` is empty, or any warning is explained in the final response.
 
 ## MR Description Pattern
