@@ -209,7 +209,19 @@ CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/script
 CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-hooks.sh" --apply
 ```
 
-应用后重新启动 Codex，使 hooks 配置生效。
+应用后重新启动 Codex，使 hooks 配置生效。首次交互式启动时，Codex 可能显示 `Hooks need review`。这不是安装失败，而是 Codex 的 hook 信任机制。人工交互时应先 review，确认 hooks 来源是当前 `marketplace-zxgc` 本地仓库后按提示信任。
+
+自动化 smoke test 可以使用一次性绕过信任选项，但只应在已经校验 hooks 模板和路径后使用：
+
+```bash
+CODEX_HOME="$CODEX_HOME" "$CODEX_BIN" exec \
+  --dangerously-bypass-hook-trust \
+  --skip-git-repo-check \
+  --sandbox read-only \
+  "只输出 marketplace-zxgc smoke ok"
+```
+
+不要把 `--dangerously-bypass-hook-trust` 当作普通日常使用默认值；它只适合受控环境里的安装验证。
 
 ## 8. 验证安装结果
 
