@@ -34,8 +34,12 @@ if [ -f "$MARKETPLACE_ROOT/scripts/auto-submit-marketplace-change.sh" ]; then
 fi
 
 if command -v rg >/dev/null 2>&1 && [ -f "$MARKETPLACE_ROOT/操作指导.md" ]; then
-  if rg -n '【人工】验证未合并 MR 分支|把 `?master`? 换成对应分支名|【人工】正式提交|手动兜底创建或更新 GitLab MR' "$MARKETPLACE_ROOT/操作指导.md"; then
+  if rg -n '【人工】验证未合并 MR 分支|把 `?master`? 换成对应分支名|【人工】正式提交|手动兜底创建或更新 GitLab MR|【人工】如果环境不能执行 Codex smoke test|【人工】如果目标机器是全新 Codex 环境' "$MARKETPLACE_ROOT/操作指导.md"; then
     echo "操作指导.md contains obsolete manual markers for automatable marketplace steps." >&2
+    exit 1
+  fi
+  if rg -n '【人工】.*(MR|GitLab|源分支|source branch|删除.*分支)' "$MARKETPLACE_ROOT/操作指导.md" | rg -v 'GitLab 网页端|网页端不可用|不要删除仍有未合并提交的分支'; then
+    echo "操作指导.md contains GitLab/manual branch wording without explicit GitLab web UI context." >&2
     exit 1
   fi
 fi

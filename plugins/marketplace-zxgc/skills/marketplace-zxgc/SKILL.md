@@ -51,15 +51,18 @@ codex plugin marketplace remove marketplace-zxgc
 
 1. Copy or edit assets inside `plugins/marketplace-zxgc/`.
 2. Keep plugin metadata in sync with added capabilities.
-3. Run `./scripts/validate-pack.sh`.
-4. Install or upgrade the marketplace with `codex plugin marketplace add` or `upgrade`.
-5. Only run installation scripts with `--apply` after reviewing the dry run.
+3. When editing operation docs, classify each step as automated, parameterized, web-console manual, credential/manual, or destructive/manual before writing labels.
+4. Run `./scripts/validate-pack.sh`.
+5. Install or upgrade the marketplace with `codex plugin marketplace add` or `upgrade`.
+6. Only run installation scripts with `--apply` after reviewing the dry run.
 
 ## Safety Rules
 
 - Back up before replacing `AGENTS.md`, `hooks.json`, or existing skills.
 - Keep skill backups outside the active skills directory, such as `$CODEX_HOME/backups/skills/<timestamp>/`, so old skill copies are not rediscovered.
-- Prefer managed templates and explicit scripts over automatic mutation.
+- Prefer managed templates and explicit scripts over free-form manual instructions.
+- Do not mark a step as `【人工】` when it can be handled through parameters, environment variables, dry-run/apply, GitLab API, or an existing marketplace script.
+- If a step truly requires GitLab web UI, say `GitLab 网页端` explicitly and keep CLI commands as fallback only.
 - Keep paths portable where possible; if a hook needs an absolute path, regenerate it with `install-hooks.sh`.
 - Package only user-level constraints, rules, and workflows that are independent of a specific absolute path or repository.
 - For absolute-path or repository-specific local rules, extract the reusable guidance into docs/templates and leave target-local commands to install scripts or local configuration.
