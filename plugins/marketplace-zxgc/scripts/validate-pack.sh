@@ -44,6 +44,11 @@ if command -v rg >/dev/null 2>&1 && [ -f "$MARKETPLACE_ROOT/操作指导.md" ]; 
   fi
 fi
 
+if command -v rg >/dev/null 2>&1 && [ -f "$PLUGIN_ROOT/skills/code-refactor/scripts/gitlab_auto_mr.py" ]; then
+  rg -q 'Change Summary' "$PLUGIN_ROOT/skills/code-refactor/scripts/gitlab_auto_mr.py"
+  rg -q 'Diff Stat' "$PLUGIN_ROOT/skills/code-refactor/scripts/gitlab_auto_mr.py"
+fi
+
 if command -v python3 >/dev/null 2>&1 && [ -f "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" ]; then
   python3 "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" "$PLUGIN_ROOT/skills/marketplace-zxgc"
 fi
