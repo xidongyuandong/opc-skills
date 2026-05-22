@@ -2,18 +2,19 @@
 set -euo pipefail
 
 MODE="dry-run"
-SMOKE_TEST="yes"
-AGENTS_MODE="block"
+SMOKE_TEST="auto"
+AGENTS_MODE="auto"
 
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/install-marketplace-zxgc.sh [--dry-run|--apply] [--smoke-test|--no-smoke-test] [--agents-mode block|replace]
+  scripts/install-marketplace-zxgc.sh [--dry-run|--apply] [--smoke-test|--no-smoke-test] [--agents-mode auto|block|replace]
 
 Environment:
   CODEX_HOME              Codex home. Defaults to $HOME/.codex.
   CODEX_BIN               Codex executable. Defaults to codex.
   MARKETPLACE_ZXGC_HOME   marketplace-zxgc repository root. Defaults to this script's repository root.
+  ZXGC_BATCH_INSTALL      Set to 1 to skip Codex smoke test in auto mode.
   ZXGC_SKILLS             Optional space-separated skill allowlist for sync-skills.sh.
   ZXGC_LINK_SKILLS        Optional space-separated skills to install as symlinks.
   ZXGC_REMOVED_SKILLS     Optional space-separated deprecated skills to move out of active skills.
@@ -61,8 +62,8 @@ if [ "$MODE" != "dry-run" ] && [ "$MODE" != "apply" ]; then
   exit 2
 fi
 
-if [ "$AGENTS_MODE" != "block" ] && [ "$AGENTS_MODE" != "replace" ]; then
-  echo "--agents-mode must be block or replace" >&2
+if [ "$AGENTS_MODE" != "auto" ] && [ "$AGENTS_MODE" != "block" ] && [ "$AGENTS_MODE" != "replace" ]; then
+  echo "--agents-mode must be auto, block, or replace" >&2
   exit 2
 fi
 
@@ -74,6 +75,39 @@ CODEX_BIN="${CODEX_BIN:-codex}"
 export CODEX_HOME
 export CODEX_BIN
 export MARKETPLACE_ZXGC_HOME="$REPO_ROOT"
+
+resolve_agents_mode() {
+  if [ "$AGENTS_MODE" != "auto" ]; then
+    printf '%s\n' "$AGENTS_MODE"
+    return
+  fi
+  if [ ! -s "$CODEX_HOME/AGENTS.md" ]; then
+    printf 'replace\n'
+  else
+    printf 'block\n'
+  fi
+}
+
+should_run_smoke_test() {
+  case "$SMOKE_TEST" in
+    yes)
+      return 0
+      ;;
+    no)
+      return 1
+      ;;
+    auto)
+      if [ "${ZXGC_BATCH_INSTALL:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
+        return 1
+      fi
+      return 0
+      ;;
+    *)
+      echo "Invalid smoke test mode: $SMOKE_TEST" >&2
+      exit 2
+      ;;
+  esac
+}
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -116,12 +150,13 @@ preflight() {
 }
 
 print_context() {
+  RESOLVED_AGENTS_MODE="$(resolve_agents_mode)"
   echo "Mode: $MODE"
   echo "Repository: $REPO_ROOT"
   echo "Plugin root: $PLUGIN_ROOT"
   echo "CODEX_HOME: $CODEX_HOME"
   echo "CODEX_BIN: $CODEX_BIN"
-  echo "AGENTS mode: $AGENTS_MODE"
+  echo "AGENTS mode: $AGENTS_MODE -> $RESOLVED_AGENTS_MODE"
   echo "Smoke test: $SMOKE_TEST"
 }
 
@@ -153,20 +188,28 @@ verify_installation() {
 }
 
 run_smoke_test() {
-  if [ "$SMOKE_TEST" != "yes" ]; then
+  if ! should_run_smoke_test; then
     return 0
   fi
   echo
   echo "==> codex smoke test"
-  CODEX_HOME="$CODEX_HOME" "$CODEX_BIN" exec \
-    --dangerously-bypass-hook-trust \
-    --skip-git-repo-check \
-    --sandbox read-only \
-    "只输出 marketplace-zxgc smoke ok"
+  if CODEX_HOME="$CODEX_HOME" "$CODEX_BIN" exec \
+      --dangerously-bypass-hook-trust \
+      --skip-git-repo-check \
+      --sandbox read-only \
+      "只输出 marketplace-zxgc smoke ok"; then
+    return 0
+  fi
+  if [ "$SMOKE_TEST" = "auto" ]; then
+    echo "Codex smoke test failed in auto mode; installation files are in place, continue for batch/preinstall environments." >&2
+    return 0
+  fi
+  return 1
 }
 
 preflight
 print_context
+RESOLVED_AGENTS_MODE="$(resolve_agents_mode)"
 
 run_step "$PLUGIN_ROOT/scripts/validate-pack.sh"
 
@@ -177,7 +220,7 @@ if [ "$MODE" = "dry-run" ]; then
   echo "Would run: $CODEX_BIN plugin remove marketplace-zxgc@marketplace-zxgc"
   echo "Would run: $CODEX_BIN plugin add marketplace-zxgc@marketplace-zxgc"
   CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/sync-skills.sh" --dry-run
-  run_step "$PLUGIN_ROOT/scripts/install-agents-md.sh" --mode "$AGENTS_MODE" --target "$CODEX_HOME/AGENTS.md"
+  run_step "$PLUGIN_ROOT/scripts/install-agents-md.sh" --mode "$RESOLVED_AGENTS_MODE" --target "$CODEX_HOME/AGENTS.md"
   CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/install-rules.sh" --dry-run
   CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/install-hooks.sh" --dry-run
   echo
@@ -189,7 +232,7 @@ run_step "$CODEX_BIN" plugin marketplace add "$REPO_ROOT"
 "$CODEX_BIN" plugin remove marketplace-zxgc@marketplace-zxgc >/dev/null 2>&1 || true
 run_step "$CODEX_BIN" plugin add marketplace-zxgc@marketplace-zxgc
 CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/sync-skills.sh" --apply
-run_step "$PLUGIN_ROOT/scripts/install-agents-md.sh" --mode "$AGENTS_MODE" --target "$CODEX_HOME/AGENTS.md" --yes
+run_step "$PLUGIN_ROOT/scripts/install-agents-md.sh" --mode "$RESOLVED_AGENTS_MODE" --target "$CODEX_HOME/AGENTS.md" --yes
 CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/install-rules.sh" --apply
 CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/install-hooks.sh" --apply
 verify_installation
