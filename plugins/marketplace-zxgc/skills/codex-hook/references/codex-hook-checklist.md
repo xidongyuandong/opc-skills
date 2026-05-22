@@ -3,7 +3,7 @@
 ## Before Editing
 
 - Confirm the request is hook-related.
-- Inspect `/Users/zhengyuyu/.codex/hooks.json`.
+- Inspect `$HOME/.codex/hooks.json`.
 - Identify the exact event and matcher affected.
 - Inspect the target script before editing.
 
@@ -12,14 +12,14 @@
 Run:
 
 ```bash
-python3 -m json.tool /Users/zhengyuyu/.codex/hooks.json >/dev/null
-python3 -m py_compile /Users/zhengyuyu/.codex/hooks/<script>.py
+python3 -m json.tool $HOME/.codex/hooks.json >/dev/null
+python3 -m py_compile $HOME/.codex/hooks/<script>.py
 ```
 
 For simple hook scripts, run a representative event:
 
 ```bash
-printf '{}' | python3 /Users/zhengyuyu/.codex/hooks/<script>.py --event SessionStart
+printf '{}' | python3 $HOME/.codex/hooks/<script>.py --event SessionStart
 ```
 
 ## Troubleshooting

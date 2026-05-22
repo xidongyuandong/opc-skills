@@ -4,9 +4,9 @@ This skill is installed for Codex as a manual/self-review workflow.
 
 ## Current Codex Status
 
-- Skill discovery works from `/Users/zhengyuyu/.codex/skills/self-improving-agent`.
+- Skill discovery works from `$HOME/.codex/skills/self-improving-agent`.
 - The upstream Claude-style hook examples are not registered directly.
-- Codex uses `/Users/zhengyuyu/.codex/hooks.json` and `/Users/zhengyuyu/.codex/hooks/codex_learning_hook.py`.
+- Codex uses `$HOME/.codex/hooks.json` and `$HOME/.codex/hooks/codex_learning_hook.py`.
 - The self-improvement loop is gated: observations create candidates, candidates can become evals or approved memories, and skill edits remain explicit.
 
 ## Practical Codex Use

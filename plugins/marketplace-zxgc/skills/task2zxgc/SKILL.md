@@ -34,7 +34,7 @@ The report includes:
 When the user invokes `/task2zxgc`, use the Agent-based flow. First dump the session context:
 
 ```bash
-python3 /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --dump-context
+python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --dump-context
 ```
 
 Then, as the Codex Agent, synthesize a JSON object with this shape:
@@ -64,7 +64,7 @@ Then, as the Codex Agent, synthesize a JSON object with this shape:
 }
 ```
 
-Use `/Users/zhengyuyu/ai-insights` as the diagnostic reference. Its useful patterns for this skill are: stable friction taxonomy, attribution/severity/confidence, effective patterns, outcome guidance, prompt-quality dimensions, and evidence sidecar thinking.
+Use `$AI_INSIGHTS_REPO` as the diagnostic reference. Its useful patterns for this skill are: stable friction taxonomy, attribution/severity/confidence, effective patterns, outcome guidance, prompt-quality dimensions, and evidence sidecar thinking.
 
 `reference_points_ai_insights` is injected by `--dump-context` as internal Agent guidance. Do not render it as a final report section. The final report should show its effect through better `core_requirement`, `raw_requirements`, `completed_tasks`, `execution_result`, `improvement_points`, and `diagnostics`.
 
@@ -73,7 +73,7 @@ Use `/Users/zhengyuyu/ai-insights` as the diagnostic reference. Its useful patte
 Finally push with the Agent-generated summary:
 
 ```bash
-python3 /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --push --agent-summary-file /path/to/agent-summary.json
+python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --push --agent-summary-file /path/to/agent-summary.json
 ```
 
 Do not run `--push` without an Agent summary. The script refuses that by default so production reports do not fall back to rule-based extraction.
@@ -81,7 +81,7 @@ Do not run `--push` without an Agent summary. The script refuses that by default
 For validation without GitLab side effects, run:
 
 ```bash
-python3 /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --dry-run --agent-summary-file /path/to/agent-summary.json
+python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --dry-run --agent-summary-file /path/to/agent-summary.json
 ```
 
 ## Posthook Mode
@@ -89,13 +89,13 @@ python3 /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2z
 The Codex `Stop` hook is configured to call:
 
 ```bash
-python3 /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/hooks/task2zxgc_posthook.py --event Stop
+python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/hooks/task2zxgc_posthook.py --event Stop
 ```
 
 The posthook is intentionally idle by default. It only pushes when a pending marker exists, which can be created with:
 
 ```bash
-python3 /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --request-posthook --agent-summary-file /path/to/agent-summary.json
+python3 $HOME/marketplace-zxgc/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py --request-posthook --agent-summary-file /path/to/agent-summary.json
 ```
 
 This prevents every session stop from creating a Git commit.

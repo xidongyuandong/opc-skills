@@ -94,7 +94,7 @@ When connection fails:
 Use `scripts/plan_remote_setup.py` to parse a pasted SSH/SCP command and print a setup plan:
 
 ```bash
-python3 /Users/zhengyuyu/.codex/skills/codex-ssh-remote-config/scripts/plan_remote_setup.py \
+python3 $HOME/.codex/skills/codex-ssh-remote-config/scripts/plan_remote_setup.py \
   --alias lpai-zyy-dev \
   --workdir /lpai/code/rllm \
   --ssh-command 'scp -i key.pem -P 32421 file root@ssh-d.example.com:/lpai'

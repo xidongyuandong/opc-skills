@@ -22,7 +22,7 @@ For the full cross-machine installation and usage guide, see the repository-leve
 From any shell:
 
 ```bash
-codex plugin marketplace add /Users/zhengyuyu/marketplace-zxgc
+codex plugin marketplace add "$HOME/marketplace-zxgc"
 ```
 
 Upgrade after edits:
@@ -34,7 +34,7 @@ codex plugin marketplace upgrade marketplace-zxgc
 ## Validate
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
 
 ## Sync Packaged Skills
@@ -42,13 +42,13 @@ codex plugin marketplace upgrade marketplace-zxgc
 Dry run:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --dry-run
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh" --dry-run
 ```
 
 Apply:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --apply
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh" --apply
 ```
 
 `code-refactor` is included in the default sync set with its `commands/` references so each subcommand can load the required procedure file.
@@ -59,7 +59,7 @@ Limit skills:
 
 ```bash
 ZXGC_SKILLS="marketplace-zxgc session-self-improvement" \
-  /Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --apply
+  "$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh" --apply
 ```
 
 ## Install AGENTS.md Template
@@ -67,13 +67,13 @@ ZXGC_SKILLS="marketplace-zxgc session-self-improvement" \
 Preview:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh --mode replace
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh" --mode replace
 ```
 
 Apply with backup:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh --mode replace --yes
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh" --mode replace --yes
 ```
 
 ## Install Hooks
@@ -81,13 +81,13 @@ Apply with backup:
 Dry run:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh --dry-run
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh" --dry-run
 ```
 
 Apply with backup:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh --apply
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh" --apply
 ```
 
 ## Install Rules Template
@@ -98,11 +98,11 @@ Only portable user-level rules belong here. Absolute-path or repository-specific
 Dry run:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh --dry-run
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh" --dry-run
 ```
 
 Apply with backup:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh --apply
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh" --apply
 ```

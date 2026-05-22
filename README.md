@@ -19,7 +19,7 @@ For a step-by-step guide covering clone, validation, marketplace registration, s
 ## Register With Codex
 
 ```bash
-codex plugin marketplace add /Users/zhengyuyu/marketplace-zxgc
+codex plugin marketplace add "$HOME/marketplace-zxgc"
 ```
 
 Upgrade after edits:
@@ -31,7 +31,7 @@ codex plugin marketplace upgrade marketplace-zxgc
 ## Validate
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
 
 ## Push Updates
@@ -45,35 +45,42 @@ https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
 Push local marketplace changes after validation:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/scripts/push-marketplace.sh
+"$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
 ```
 
-The script reads `GITLAB_PERSONAL_ACCESS_TOKEN` from `/Users/zhengyuyu/.claude/feishu.env` and does not store the token in the Git remote URL.
+The push script discovers the repository root from its own path. For GitLab authentication, use one of:
+
+- Export `GITLAB_PERSONAL_ACCESS_TOKEN` or `GITLAB_TOKEN` in the shell.
+- Point `MARKETPLACE_ZXGC_ENV_FILE` to a local env file containing one of those variables.
+- Store a local env file at `$HOME/.config/marketplace-zxgc/env` or `$HOME/.marketplace-zxgc.env`.
+- Configure Git's credential helper for the GitLab remote.
+
+Do not commit local env files, tokens, cookies, private keys, or raw credential output.
 
 ## Safe Install Actions
 
 Preview skill sync:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --dry-run
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh" --dry-run
 ```
 
 Preview AGENTS.md install:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh --mode replace
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh" --mode replace
 ```
 
 Preview hooks install:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh --dry-run
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh" --dry-run
 ```
 
 Preview rules install:
 
 ```bash
-/Users/zhengyuyu/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh --dry-run
+"$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh" --dry-run
 ```
 
 Rules templates are curated for portable user-level behavior. Local absolute paths and repository-specific commands should stay in local configuration or be expressed as reusable guidance before packaging.

@@ -5,7 +5,7 @@ This reference is copied from the validated operation guide. Load it when the us
 Source guide path:
 
 ```text
-/Users/zhengyuyu/programs/lixiang/agent_create_code/prompts/codex配置/ssh配置.guide.md
+$HOME/programs/lixiang/agent_create_code/prompts/codex配置/ssh配置.guide.md
 ```
 
 Feishu version:

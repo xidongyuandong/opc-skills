@@ -9,3 +9,4 @@ auth.json
 *.pem
 .env
 .env.*
+.marketplace-zxgc.env

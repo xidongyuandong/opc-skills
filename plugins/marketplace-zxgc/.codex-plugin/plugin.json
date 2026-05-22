@@ -8,7 +8,7 @@
     "url": "https://example.com/marketplace-zxgc"
   },
   "homepage": "https://example.com/marketplace-zxgc",
-  "repository": "local:/Users/zhengyuyu/marketplace-zxgc",
+  "repository": "https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc",
   "license": "MIT",
   "keywords": [
     "codex",

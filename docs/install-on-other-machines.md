@@ -235,7 +235,42 @@ codex plugin marketplace upgrade marketplace-zxgc
 
 如更新了 AGENTS.md、rules 或 hooks 模板，分别重新执行对应 dry-run 和 apply。
 
-## 10. 卸载或回滚
+## 10. 维护者推送配置
+
+普通安装和使用不需要配置 GitLab token。只有需要从本机向 `marketplace-zxgc` 远端提交维护变更时，才需要配置推送凭据。
+
+推送脚本会从自身位置自动识别仓库根目录，不依赖原机器绝对路径：
+
+```bash
+"$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
+```
+
+凭据识别优先级：
+
+- 当前 shell 已导出的 `GITLAB_PERSONAL_ACCESS_TOKEN` 或 `GITLAB_TOKEN`。
+- `MARKETPLACE_ZXGC_ENV_FILE` 指向的本机 env 文件。
+- `$HOME/.config/marketplace-zxgc/env`。
+- `$HOME/.marketplace-zxgc.env`。
+- Git 已配置的 credential helper。
+
+推荐配置：
+
+```bash
+mkdir -p "$HOME/.config/marketplace-zxgc"
+cp "$HOME/marketplace-zxgc/docs/marketplace-zxgc.env.example" "$HOME/.config/marketplace-zxgc/env"
+chmod 600 "$HOME/.config/marketplace-zxgc/env"
+```
+
+然后编辑 `$HOME/.config/marketplace-zxgc/env`，填入本机自己的 token。不要把真实 token、cookie、私钥或登录态文件提交到仓库。
+
+也可以临时指定 env 文件：
+
+```bash
+MARKETPLACE_ZXGC_ENV_FILE="$HOME/private/marketplace-zxgc.env" \
+  "$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
+```
+
+## 11. 卸载或回滚
 
 从 Codex marketplace 移除注册：
 

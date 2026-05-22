@@ -9,13 +9,13 @@ This skill is retained for backwards compatibility. The active implementation ha
 
 ## Routing
 
-When invoked, use `/Users/zhengyuyu/.codex/skills/session-self-improvement/SKILL.md` as the authoritative workflow.
+When invoked, use `$HOME/.codex/skills/session-self-improvement/SKILL.md` as the authoritative workflow.
 
 Preserve these concepts from the old workflow by loading the matching references only when needed:
 
-- Multi-memory classification: `/Users/zhengyuyu/.codex/skills/session-self-improvement/references/self-improvement-memory-model.md`
-- Evolution and correction markers: `/Users/zhengyuyu/.codex/skills/session-self-improvement/references/evolution-markers.md`
-- Retrospective checklist: `/Users/zhengyuyu/.codex/skills/session-self-improvement/references/session-retrospective-checklist.md`
+- Multi-memory classification: `$HOME/.codex/skills/session-self-improvement/references/self-improvement-memory-model.md`
+- Evolution and correction markers: `$HOME/.codex/skills/session-self-improvement/references/evolution-markers.md`
+- Retrospective checklist: `$HOME/.codex/skills/session-self-improvement/references/session-retrospective-checklist.md`
 
 ## Guardrails
 

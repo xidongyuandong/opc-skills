@@ -23,7 +23,7 @@ STATE_DIR = CODEX_HOME / "task2zxgc"
 PENDING_FILE = STATE_DIR / "pending.json"
 DEFAULT_REPO_URL = "https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git"
 DEFAULT_REPO_DIR = STATE_DIR / "ai-coding-zxgc-managment"
-DEFAULT_AI_INSIGHTS_REPO = Path("/Users/zhengyuyu/ai-insights")
+DEFAULT_AI_INSIGHTS_REPO = Path(os.environ.get("AI_INSIGHTS_REPO", str(HOME / "ai-insights")))
 
 
 @dataclass

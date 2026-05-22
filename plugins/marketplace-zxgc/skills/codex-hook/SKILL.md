@@ -1,6 +1,6 @@
 ---
 name: codex-hook
-description: Create, modify, validate, or troubleshoot Codex hook configuration and hook scripts, including SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse, and Stop. Use when the user asks about Codex hooks, migrating old skill-hook behavior, automating lifecycle events, wiring session learning/self-improvement hooks, or debugging /Users/zhengyuyu/.codex/hooks.json and /Users/zhengyuyu/.codex/hooks/.
+description: Create, modify, validate, or troubleshoot Codex hook configuration and hook scripts, including SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse, and Stop. Use when the user asks about Codex hooks, migrating old skill-hook behavior, automating lifecycle events, wiring session learning/self-improvement hooks, or debugging $HOME/.codex/hooks.json and $HOME/.codex/hooks/.
 ---
 
 # Codex Hook
@@ -10,16 +10,16 @@ description: Create, modify, validate, or troubleshoot Codex hook configuration 
 Work on Codex hooks only. Codex hooks live at:
 
 ```text
-/Users/zhengyuyu/.codex/hooks.json
-/Users/zhengyuyu/.codex/hooks/
+$HOME/.codex/hooks.json
+$HOME/.codex/hooks/
 ```
 
 This skill replaces the old `skill-hook` name. When older notes mention `skill-hook`, interpret that as `codex-hook`.
 
 ## Workflow
 
-1. Read `/Users/zhengyuyu/.codex/hooks.json`.
-2. Read only the relevant script under `/Users/zhengyuyu/.codex/hooks/`.
+1. Read `$HOME/.codex/hooks.json`.
+2. Read only the relevant script under `$HOME/.codex/hooks/`.
 3. Preserve existing hook entries and append or edit narrowly.
 4. If the requested behavior fits an existing script, extend that script narrowly.
 5. If the behavior is independent, add a small dedicated hook script.
@@ -59,7 +59,7 @@ When hooks need to interact with MCP, Obsidian, or other knowledge stores:
 
 ## Permission Boundary
 
-If Codex cannot write under `/Users/zhengyuyu/.codex/hooks` or `/Users/zhengyuyu/.codex/hooks.json`, stop and ask for manual help. Provide exact commands instead of attempting unrelated workarounds.
+If Codex cannot write under `$HOME/.codex/hooks` or `$HOME/.codex/hooks.json`, stop and ask for manual help. Provide exact commands instead of attempting unrelated workarounds.
 
 Do not print private key contents, auth files, tokens, or hook payload secrets.
 

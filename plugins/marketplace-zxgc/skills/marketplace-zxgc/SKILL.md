@@ -5,7 +5,7 @@ description: Maintain the local ZXGC Codex marketplace plugin pack, including pa
 
 # Marketplace ZXGC
 
-Use this skill to operate the local marketplace pack at `/Users/zhengyuyu/marketplace-zxgc`.
+Use this skill to operate the local marketplace pack from the current cloned repository path.
 
 ## What This Plugin Owns
 
@@ -40,7 +40,7 @@ From the plugin root:
 From the marketplace root:
 
 ```bash
-codex plugin marketplace add /Users/zhengyuyu/marketplace-zxgc
+codex plugin marketplace add "$HOME/marketplace-zxgc"
 codex plugin marketplace upgrade marketplace-zxgc
 codex plugin marketplace remove marketplace-zxgc
 ```
