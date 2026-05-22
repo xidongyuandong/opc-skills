@@ -20,6 +20,7 @@ STAMP="$(date +%Y%m%d%H%M%S)"
 DEFAULT_SKILLS="marketplace-zxgc session-self-improvement self-improving-agent continuous-learning-v2 code-refactor codex-hooks codex-hook codex-remote-container codex-ssh-remote-config algorithm-engineer-workflow algorithm-data-diagnosis algorithm-tensorboard-analysis algorithm-training-debug algorithm-training-review algorithm-rl-debug algorithm-eval-diagnosis algorithm-eval-closure algorithm-agent-trace-analysis"
 SKILLS="${ZXGC_SKILLS:-$DEFAULT_SKILLS}"
 LINK_SKILLS="${ZXGC_LINK_SKILLS:-}"
+REMOVED_SKILLS="${ZXGC_REMOVED_SKILLS:-auto-merge-request.moved-to-code-refactor.20260521}"
 
 is_link_skill() {
   case " $LINK_SKILLS " in
@@ -33,6 +34,22 @@ echo "Source: $PLUGIN_ROOT/skills"
 echo "Target: $TARGET_ROOT"
 echo "Backup: $BACKUP_ROOT/$STAMP"
 echo "Skills: $SKILLS"
+echo "Removed skills: ${REMOVED_SKILLS:-<none>}"
+
+for skill in $REMOVED_SKILLS; do
+  dst="$TARGET_ROOT/$skill"
+  if [ ! -e "$dst" ]; then
+    continue
+  fi
+  if [ "$MODE" = "dry-run" ]; then
+    echo "Would remove deprecated skill $dst -> $BACKUP_ROOT/$STAMP/$skill"
+    continue
+  fi
+  mkdir -p "$BACKUP_ROOT/$STAMP"
+  backup="$BACKUP_ROOT/$STAMP/$skill"
+  echo "Removing deprecated skill $dst -> $backup"
+  mv "$dst" "$backup"
+done
 
 for skill in $SKILLS; do
   src="$PLUGIN_ROOT/skills/$skill"
