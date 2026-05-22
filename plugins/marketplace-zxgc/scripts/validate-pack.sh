@@ -33,6 +33,13 @@ if [ -f "$MARKETPLACE_ROOT/scripts/auto-submit-marketplace-change.sh" ]; then
   bash -n "$MARKETPLACE_ROOT/scripts/auto-submit-marketplace-change.sh"
 fi
 
+if command -v rg >/dev/null 2>&1 && [ -f "$MARKETPLACE_ROOT/操作指导.md" ]; then
+  if rg -n '【人工】验证未合并 MR 分支|把 `?master`? 换成对应分支名|【人工】正式提交|手动兜底创建或更新 GitLab MR' "$MARKETPLACE_ROOT/操作指导.md"; then
+    echo "操作指导.md contains obsolete manual markers for automatable marketplace steps." >&2
+    exit 1
+  fi
+fi
+
 if command -v python3 >/dev/null 2>&1 && [ -f "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" ]; then
   python3 "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" "$PLUGIN_ROOT/skills/marketplace-zxgc"
 fi
