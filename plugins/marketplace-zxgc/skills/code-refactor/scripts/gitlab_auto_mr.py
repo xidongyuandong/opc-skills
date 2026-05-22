@@ -102,7 +102,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project-url", default=None, help="HTTPS GitLab project URL; defaults to origin")
     parser.add_argument("--source-branch", default=None, help="Source branch; defaults to current branch")
-    parser.add_argument("--target-branch", required=True, help="Target branch for the MR")
+    parser.add_argument("--target-branch", default=None, help="Target branch for the MR; defaults to project default branch")
+    parser.add_argument(
+        "--allow-non-default-target",
+        action="store_true",
+        help="Allow targeting a non-default branch; issue auto-close may not run after merge",
+    )
     parser.add_argument("--mr-title", default=None, help="MR title; defaults to HEAD subject")
     parser.add_argument("--mr-iid", type=int, default=None, help="Existing MR IID to update instead of creating one")
     parser.add_argument("--issue-iid", type=int, default=None, help="Existing issue IID to link instead of creating one")
@@ -131,6 +136,19 @@ def main():
     warnings = []
 
     project = gitlab.get(f"/projects/{project_id}")
+    default_branch = project.get("default_branch")
+    target_branch = args.target_branch or default_branch
+    if not target_branch:
+        raise SystemExit("Could not determine target branch; pass --target-branch explicitly")
+    if default_branch and target_branch != default_branch:
+        message = (
+            f"Target branch '{target_branch}' is not the project default branch '{default_branch}'. "
+            "GitLab issue auto-close normally runs when the MR is merged into the default branch."
+        )
+        if not args.allow_non_default_target:
+            raise SystemExit(message + " Pass --allow-non-default-target to override.")
+        warnings.append(message)
+
     if args.issue_iid:
         issue = gitlab.get(f"/projects/{project['id']}/issues/{args.issue_iid}")
         update_issue = {}
@@ -157,7 +175,7 @@ def main():
         f"Related issue: #{issue_iid} {issue_title}\n\n"
         f"Closes #{issue_iid}\n\n"
         f"Source branch: {source_branch}\n"
-        f"Target branch: {args.target_branch}\n\n"
+        f"Target branch: {target_branch}\n\n"
         f"HEAD: {head}"
     )
 
@@ -165,7 +183,7 @@ def main():
     if not args.no_create_mr:
         data = {
             "source_branch": source_branch,
-            "target_branch": args.target_branch,
+            "target_branch": target_branch,
             "title": mr_title,
             "description": mr_description,
             "remove_source_branch": "false",
@@ -177,7 +195,7 @@ def main():
                 f"/projects/{project['id']}/merge_requests",
                 {
                     "source_branch": source_branch,
-                    "target_branch": args.target_branch,
+                    "target_branch": target_branch,
                     "state": "opened",
                 },
             )
@@ -199,6 +217,8 @@ def main():
 
     output = {
         "project": project.get("path_with_namespace"),
+        "default_branch": default_branch,
+        "target_branch": target_branch,
         "issue": {
             "iid": issue.get("iid"),
             "title": issue.get("title"),
