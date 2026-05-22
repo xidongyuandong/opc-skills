@@ -13,6 +13,8 @@
 - Make surgical changes: edit only what the current request requires. Mention unrelated issues instead of fixing them.
 - Never revert, overwrite, or delete user changes unless explicitly requested.
 - Surface conflicts between user requests, AGENTS files, skills, hooks, MCP/tool behavior, and repository conventions instead of blending incompatible rules.
+- Treat labels such as `【人工】`, manual-only, fallback, optional, required, and destructive as controlled workflow terms. Before adding or preserving them, verify whether the step can instead be automated through an existing script, flag, environment variable, dry-run/apply flow, MCP, hook, or GitLab/API workflow.
+- When the user asks for automatic or robust execution, do not leave parameterizable steps as manual instructions. Convert branch names, modes, toggles, MR/issue identifiers, and smoke-test behavior into explicit parameters or scripts, then document the automated path.
 
 ## Complex Task Method
 
@@ -39,6 +41,7 @@
 ## Verification And Reporting
 
 - Choose the narrowest useful verification first; broaden when shared behavior, public APIs, generated files, or user-facing flows are affected.
+- For documentation that encodes workflows, verify not only syntax but also instruction compliance: search for stale manual markers, hard-coded branch names, local absolute paths, and outdated fallback wording that contradict the current user intent.
 - If verification cannot run, report the exact command attempted, the failure reason, and remaining risk.
 - If blocked by `Operation not permitted` on a user-owned path, distinguish sandbox limits from real file permissions. If normal Terminal/manual action is needed, provide exact commands, then re-check after the user runs them.
 - Redact tokens, passwords, private keys, cookies, and internal credentials in all outputs.
