@@ -22,6 +22,63 @@ def run_git(args):
     return result.stdout.strip()
 
 
+def try_git(args):
+    result = subprocess.run(
+        ["git", *args],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout.strip()
+
+
+def first_existing_ref(candidates):
+    for ref in candidates:
+        if try_git(["rev-parse", "--verify", ref]):
+            return ref
+    return ""
+
+
+def truncate_lines(text, max_lines=40, max_chars=6000):
+    lines = text.splitlines()
+    truncated = "\n".join(lines[:max_lines])
+    if len(lines) > max_lines:
+        truncated += f"\n... ({len(lines) - max_lines} more lines)"
+    if len(truncated) > max_chars:
+        truncated = truncated[:max_chars].rstrip() + "\n... (truncated)"
+    return truncated
+
+
+def build_change_summary(source_branch, target_branch):
+    base_ref = first_existing_ref([f"origin/{target_branch}", target_branch])
+    source_ref = first_existing_ref([source_branch, "HEAD"]) or "HEAD"
+    if not base_ref:
+        head_subject = try_git(["log", "-1", "--pretty=format:%h %s"]) or "unavailable"
+        return f"## Change Summary\n\n- Base ref `{target_branch}` was not available locally.\n- HEAD: {head_subject}"
+
+    commit_log = try_git(["log", "--oneline", "--no-merges", f"{base_ref}..{source_ref}"])
+    diff_stat = try_git(["diff", "--stat", f"{base_ref}...{source_ref}"])
+    name_status = try_git(["diff", "--name-status", f"{base_ref}...{source_ref}"])
+    if not commit_log and not diff_stat and not name_status:
+        commit_log = try_git(["log", "-1", "--pretty=format:%h %s"])
+
+    sections = [
+        "## Change Summary",
+        "",
+        f"- Source branch: `{source_branch}`",
+        f"- Target branch: `{target_branch}`",
+    ]
+    if commit_log:
+        sections.extend(["", "### Commits", "", "```text", truncate_lines(commit_log, max_lines=20), "```"])
+    if diff_stat:
+        sections.extend(["", "### Diff Stat", "", "```text", truncate_lines(diff_stat, max_lines=30), "```"])
+    if name_status:
+        sections.extend(["", "### Changed Files", "", "```text", truncate_lines(name_status, max_lines=40), "```"])
+    return "\n".join(sections)
+
+
 def parse_project_url(url):
     parsed = urllib.parse.urlparse(url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
@@ -114,6 +171,8 @@ def main():
     parser.add_argument("--issue-title", default=None, help="Issue title; required unless --issue-iid is used")
     parser.add_argument("--issue-description", default=None, help="Issue description text")
     parser.add_argument("--issue-description-file", default=None, help="File containing issue description")
+    parser.add_argument("--change-summary", default=None, help="Explicit change summary for issue/MR descriptions")
+    parser.add_argument("--change-summary-file", default=None, help="File containing explicit change summary")
     parser.add_argument("--no-create-mr", action="store_true", help="Create/update issue only")
     parser.add_argument("--verify-retries", type=int, default=5, help="Poll related MRs this many times after writes")
     parser.add_argument("--verify-delay", type=float, default=1.0, help="Seconds between verification retries")
@@ -149,20 +208,31 @@ def main():
             raise SystemExit(message + " Pass --allow-non-default-target to override.")
         warnings.append(message)
 
+    change_summary = read_optional_text(args.change_summary, args.change_summary_file) or build_change_summary(
+        source_branch,
+        target_branch,
+    )
+    full_issue_description = issue_description
+    if change_summary:
+        if full_issue_description:
+            full_issue_description = full_issue_description.rstrip() + "\n\n" + change_summary
+        else:
+            full_issue_description = change_summary
+
     if args.issue_iid:
         issue = gitlab.get(f"/projects/{project['id']}/issues/{args.issue_iid}")
         update_issue = {}
         if args.issue_title and args.issue_title != issue.get("title"):
             update_issue["title"] = args.issue_title
-        if issue_description:
-            update_issue["description"] = issue_description
+        if full_issue_description:
+            update_issue["description"] = full_issue_description
         if update_issue:
             issue = gitlab.request("PUT", f"/projects/{project['id']}/issues/{args.issue_iid}", update_issue)
     else:
         issue = gitlab.request(
             "POST",
             f"/projects/{project['id']}/issues",
-            {"title": args.issue_title, "description": issue_description},
+            {"title": args.issue_title, "description": full_issue_description},
         )
     issue_iid = issue.get("iid", "ISSUE_IID")
     issue_title = args.issue_title or issue.get("title", "")
@@ -176,7 +246,8 @@ def main():
         f"Closes #{issue_iid}\n\n"
         f"Source branch: {source_branch}\n"
         f"Target branch: {target_branch}\n\n"
-        f"HEAD: {head}"
+        f"HEAD: {head}\n\n"
+        f"{change_summary}"
     )
 
     mr = None
