@@ -23,6 +23,8 @@ For the current Chinese automated installation guide, use [操作指导.md](操�
 "$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --apply
 ```
 
+For a Chinese overview of packaged skills and when to use them, see [技能介绍.md](技能介绍.md).
+
 ## Register With Codex
 
 ```bash
@@ -41,7 +43,7 @@ codex plugin marketplace upgrade marketplace-zxgc
 "$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
 
-## Push Updates
+## Submit Updates
 
 The repository remote is:
 
@@ -49,13 +51,14 @@ The repository remote is:
 https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
 ```
 
-Push local marketplace changes after validation:
+Submit local marketplace changes after validation, branch creation, commit, push, and GitLab issue/MR creation:
 
 ```bash
-"$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
+"$HOME/marketplace-zxgc/scripts/auto-submit-marketplace-change.sh" --dry-run --title "update marketplace"
+"$HOME/marketplace-zxgc/scripts/auto-submit-marketplace-change.sh" --apply --title "update marketplace"
 ```
 
-The push script discovers the repository root from its own path. For GitLab authentication, use one of:
+The script discovers the repository root from its own path, infers a content-based branch, and uses the packaged `code-refactor` auto-merge-request helper. For GitLab authentication, use one of:
 
 - Export `GITLAB_PERSONAL_ACCESS_TOKEN` or `GITLAB_TOKEN` in the shell.
 - Point `MARKETPLACE_ZXGC_ENV_FILE` to a local env file containing one of those variables.
@@ -63,6 +66,12 @@ The push script discovers the repository root from its own path. For GitLab auth
 - Configure Git's credential helper for the GitLab remote.
 
 Do not commit local env files, tokens, cookies, private keys, or raw credential output.
+
+For a simple fallback that only commits and pushes the current branch, use:
+
+```bash
+"$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
+```
 
 ## Safe Install Actions
 

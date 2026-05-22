@@ -43,6 +43,8 @@ From the marketplace root:
 codex plugin marketplace add "$HOME/marketplace-zxgc"
 codex plugin marketplace upgrade marketplace-zxgc
 codex plugin marketplace remove marketplace-zxgc
+./scripts/auto-submit-marketplace-change.sh --dry-run --title "update marketplace"
+./scripts/auto-submit-marketplace-change.sh --apply --title "update marketplace"
 ```
 
 ## Update Workflow
