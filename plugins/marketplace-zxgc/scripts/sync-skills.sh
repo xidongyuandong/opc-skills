@@ -14,6 +14,7 @@ fi
 PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
 TARGET_ROOT="$CODEX_HOME/skills"
+BACKUP_ROOT="$CODEX_HOME/backups/skills"
 STAMP="$(date +%Y%m%d%H%M%S)"
 
 DEFAULT_SKILLS="marketplace-zxgc session-self-improvement self-improving-agent continuous-learning-v2 code-refactor codex-hooks codex-hook codex-remote-container codex-ssh-remote-config"
@@ -30,6 +31,7 @@ is_link_skill() {
 echo "Mode: $MODE"
 echo "Source: $PLUGIN_ROOT/skills"
 echo "Target: $TARGET_ROOT"
+echo "Backup: $BACKUP_ROOT/$STAMP"
 echo "Skills: $SKILLS"
 
 for skill in $SKILLS; do
@@ -40,6 +42,9 @@ for skill in $SKILLS; do
     continue
   fi
   if [ "$MODE" = "dry-run" ]; then
+    if [ -e "$dst" ]; then
+      echo "Would back up $dst -> $BACKUP_ROOT/$STAMP/$skill"
+    fi
     if is_link_skill "$skill"; then
       echo "Would link $dst -> $src"
     else
@@ -49,7 +54,8 @@ for skill in $SKILLS; do
   fi
   mkdir -p "$TARGET_ROOT"
   if [ -e "$dst" ]; then
-    backup="$dst.bak.$STAMP"
+    mkdir -p "$BACKUP_ROOT/$STAMP"
+    backup="$BACKUP_ROOT/$STAMP/$skill"
     echo "Backing up $dst -> $backup"
     mv "$dst" "$backup"
   fi

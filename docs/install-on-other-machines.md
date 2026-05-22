@@ -45,22 +45,36 @@ codex --version
 
 如果 `codex` 不存在，先按当前 Codex 官方安装方式安装或升级 Codex CLI。
 
+如果目标机器的 Codex home 不是默认 `$HOME/.codex`，先设置 `CODEX_HOME`。例如 c250/container250 使用：
+
+```bash
+export CODEX_HOME=/data/jenkins/.codex/home
+export CODEX_BIN=/data/jenkins/.codex/bin/codex
+export MARKETPLACE_ZXGC_HOME=/data/jenkins/marketplace-zxgc
+```
+
+普通机器可以使用默认值：
+
+```bash
+export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+export CODEX_BIN="${CODEX_BIN:-codex}"
+export MARKETPLACE_ZXGC_HOME="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}"
+```
+
 ## 1. 拉取仓库
 
 推荐放在用户目录下，避免使用原机器的绝对路径：
 
 ```bash
-cd ~
-git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
-cd ~/marketplace-zxgc
+git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLACE_ZXGC_HOME"
+cd "$MARKETPLACE_ZXGC_HOME"
 ```
 
 如果目标机器已配置 GitLab SSH，也可以使用 SSH remote：
 
 ```bash
-cd ~
-git clone git@gitlab.chehejia.com:zhengyuyu/marketplace-zxgc.git
-cd ~/marketplace-zxgc
+git clone git@gitlab.chehejia.com:zhengyuyu/marketplace-zxgc.git "$MARKETPLACE_ZXGC_HOME"
+cd "$MARKETPLACE_ZXGC_HOME"
 ```
 
 ## 2. 校验 marketplace 包
@@ -68,7 +82,7 @@ cd ~/marketplace-zxgc
 先校验包结构、脚本语法和 skill 基本格式：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh
+"$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
 
 预期看到：
@@ -84,36 +98,39 @@ marketplace-zxgc validation passed
 把本地仓库注册为 Codex marketplace：
 
 ```bash
-codex plugin marketplace add ~/marketplace-zxgc
+"$CODEX_BIN" plugin marketplace add "$MARKETPLACE_ZXGC_HOME"
 ```
 
 查看是否已注册：
 
 ```bash
-codex plugin marketplace list
-codex plugin list
+"$CODEX_BIN" plugin marketplace list
+"$CODEX_BIN" plugin list
 ```
 
 后续仓库更新后，在目标机器执行：
 
 ```bash
-cd ~/marketplace-zxgc
+cd "$MARKETPLACE_ZXGC_HOME"
 git pull --ff-only
-codex plugin marketplace upgrade marketplace-zxgc
+"$CODEX_BIN" plugin remove marketplace-zxgc@marketplace-zxgc
+"$CODEX_BIN" plugin add marketplace-zxgc@marketplace-zxgc
 ```
+
+说明：local marketplace 更新后，部分 Codex 版本不会通过 `plugin marketplace upgrade` 刷新已安装插件缓存。更稳妥的方式是先 `plugin remove marketplace-zxgc@marketplace-zxgc`，再 `plugin add marketplace-zxgc@marketplace-zxgc`。
 
 ## 4. 同步 skills
 
 先 dry-run：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --dry-run
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/sync-skills.sh" --dry-run
 ```
 
 确认输出符合预期后再应用：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --apply
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/sync-skills.sh" --apply
 ```
 
 默认会同步这些 skills：
@@ -126,30 +143,30 @@ marketplace-zxgc session-self-improvement self-improving-agent continuous-learni
 
 ```bash
 ZXGC_SKILLS="marketplace-zxgc session-self-improvement code-refactor" \
-  ~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --apply
+  CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/sync-skills.sh" --apply
 ```
 
 如希望某些 skill 以软链接方式安装，便于仓库更新后立即生效：
 
 ```bash
 ZXGC_LINK_SKILLS="marketplace-zxgc code-refactor" \
-  ~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --apply
+  CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/sync-skills.sh" --apply
 ```
 
-注意：脚本会在覆盖已有 skill 前生成时间戳备份。
+注意：脚本会在覆盖已有 skill 前生成时间戳备份，备份位置是 `$CODEX_HOME/backups/skills/<timestamp>/`。备份不会放在 `$CODEX_HOME/skills` 下，避免旧 skill 被误发现或污染扫描结果。
 
 ## 5. 安装 AGENTS.md 模板
 
 AGENTS.md 会影响 Codex 的用户级行为约束。先预览：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh --mode replace
+"$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-agents-md.sh" --mode replace --target "$CODEX_HOME/AGENTS.md"
 ```
 
 确认后应用：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agents-md.sh --mode replace --yes
+"$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-agents-md.sh" --mode replace --target "$CODEX_HOME/AGENTS.md" --yes
 ```
 
 原则：
@@ -163,13 +180,13 @@ AGENTS.md 会影响 Codex 的用户级行为约束。先预览：
 rules 会影响 Codex 对命令执行的自动许可判断。先 dry-run：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh --dry-run
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-rules.sh" --dry-run
 ```
 
 确认后应用：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-rules.sh --apply
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-rules.sh" --apply
 ```
 
 rules 同步原则：
@@ -183,13 +200,13 @@ rules 同步原则：
 hooks 可能引用本机安装路径，因此必须在目标机器本地生成。先 dry-run：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh --dry-run
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-hooks.sh" --dry-run
 ```
 
 确认后应用：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-hooks.sh --apply
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-hooks.sh" --apply
 ```
 
 应用后重新启动 Codex，使 hooks 配置生效。
@@ -199,10 +216,10 @@ hooks 可能引用本机安装路径，因此必须在目标机器本地生成�
 检查文件：
 
 ```bash
-ls ~/.codex/skills
-test -f ~/.codex/AGENTS.md && echo "AGENTS.md installed"
-test -f ~/.codex/rules/default.rules && echo "rules installed"
-test -f ~/.codex/hooks.json && echo "hooks installed"
+ls "$CODEX_HOME/skills"
+test -f "$CODEX_HOME/AGENTS.md" && echo "AGENTS.md installed"
+test -f "$CODEX_HOME/rules/default.rules" && echo "rules installed"
+test -f "$CODEX_HOME/hooks.json" && echo "hooks installed"
 ```
 
 检查 Codex 内 skill 是否可用：
@@ -220,17 +237,18 @@ $code-refactor
 常用命令：
 
 ```bash
-cd ~/marketplace-zxgc
+cd "$MARKETPLACE_ZXGC_HOME"
 git pull --ff-only
-codex plugin marketplace upgrade marketplace-zxgc
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh
+"$CODEX_BIN" plugin remove marketplace-zxgc@marketplace-zxgc
+"$CODEX_BIN" plugin add marketplace-zxgc@marketplace-zxgc
+"$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
 
 更新后按需重新同步：
 
 ```bash
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --dry-run
-~/marketplace-zxgc/plugins/marketplace-zxgc/scripts/sync-skills.sh --apply
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/sync-skills.sh" --dry-run
+CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/sync-skills.sh" --apply
 ```
 
 如更新了 AGENTS.md、rules 或 hooks 模板，分别重新执行对应 dry-run 和 apply。
@@ -242,7 +260,7 @@ codex plugin marketplace upgrade marketplace-zxgc
 推送脚本会从自身位置自动识别仓库根目录，不依赖原机器绝对路径：
 
 ```bash
-"$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
+"$MARKETPLACE_ZXGC_HOME/scripts/push-marketplace.sh"
 ```
 
 凭据识别优先级：
@@ -257,7 +275,7 @@ codex plugin marketplace upgrade marketplace-zxgc
 
 ```bash
 mkdir -p "$HOME/.config/marketplace-zxgc"
-cp "$HOME/marketplace-zxgc/docs/marketplace-zxgc.env.example" "$HOME/.config/marketplace-zxgc/env"
+cp "$MARKETPLACE_ZXGC_HOME/docs/marketplace-zxgc.env.example" "$HOME/.config/marketplace-zxgc/env"
 chmod 600 "$HOME/.config/marketplace-zxgc/env"
 ```
 
@@ -267,7 +285,7 @@ chmod 600 "$HOME/.config/marketplace-zxgc/env"
 
 ```bash
 MARKETPLACE_ZXGC_ENV_FILE="$HOME/private/marketplace-zxgc.env" \
-  "$HOME/marketplace-zxgc/scripts/push-marketplace.sh"
+  "$MARKETPLACE_ZXGC_HOME/scripts/push-marketplace.sh"
 ```
 
 ## 11. 卸载或回滚
@@ -275,14 +293,14 @@ MARKETPLACE_ZXGC_ENV_FILE="$HOME/private/marketplace-zxgc.env" \
 从 Codex marketplace 移除注册：
 
 ```bash
-codex plugin marketplace remove marketplace-zxgc
+"$CODEX_BIN" plugin marketplace remove marketplace-zxgc
 ```
 
 恢复被安装脚本备份的文件：
 
 ```bash
-ls ~/.codex/*.bak.*
-ls ~/.codex/skills/*.bak.*
+ls "$CODEX_HOME"/*.bak.*
+find "$CODEX_HOME/backups/skills" -maxdepth 2 -type d 2>/dev/null
 ```
 
 选择需要恢复的备份后手动 `mv` 回原路径。不要直接删除当前配置，除非确认已有可用备份。

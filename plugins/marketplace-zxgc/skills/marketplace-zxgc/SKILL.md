@@ -56,6 +56,7 @@ codex plugin marketplace remove marketplace-zxgc
 ## Safety Rules
 
 - Back up before replacing `AGENTS.md`, `hooks.json`, or existing skills.
+- Keep skill backups outside the active skills directory, such as `$CODEX_HOME/backups/skills/<timestamp>/`, so old skill copies are not rediscovered.
 - Prefer managed templates and explicit scripts over automatic mutation.
 - Keep paths portable where possible; if a hook needs an absolute path, regenerate it with `install-hooks.sh`.
 - Package only user-level constraints, rules, and workflows that are independent of a specific absolute path or repository.
