@@ -214,6 +214,8 @@ def main():
                 break
             if attempt + 1 < args.verify_retries:
                 time.sleep(args.verify_delay)
+    if mr and mr.get("iid"):
+        mr = gitlab.get(f"/projects/{project['id']}/merge_requests/{mr['iid']}")
 
     output = {
         "project": project.get("path_with_namespace"),
