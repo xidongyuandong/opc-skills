@@ -311,6 +311,7 @@ def session_context(summary: SessionSummary, ai_insights_repo: Path = DEFAULT_AI
             "material_type": "为每个报告选择主线：debug/troubleshooting、feature implementation、research/decision、repository analysis、general workflow、algorithm direction。",
             "core_claim": "每个报告的 task_theme/core_requirement 必须能表达对象、判断、价值和边界，避免写成按时间排列的会话流水账。",
             "task_theme": "用 1 段话总结本次任务的核心目标，不要复制原始消息。",
+            "user_original_inputs": "独立模块，保留用户原始输入的脱敏摘录；按来源区分需求文件内容、命令行输入、会话用户消息等，用于评估用户是否高效使用智能体完成任务。",
             "requirements": "用条目归纳用户需求描述，可以保留关键路径、仓库、命令和约束。",
             "execution_process": "按阶段归纳任务执行过程，说明关键决策、实现步骤和验证动作，不要列原始工具流水账。",
             "completed_tasks": "用条目归纳已经完成的工作。",
@@ -349,6 +350,73 @@ def normalize_string_list(value: Any) -> list[str]:
         formatted = format_summary_item(value)
         return [formatted] if formatted else []
     return []
+
+
+def normalize_user_original_inputs(value: Any) -> list[dict[str, str]]:
+    if not value:
+        return []
+    raw_items = value if isinstance(value, list) else [value]
+    normalized: list[dict[str, str]] = []
+    for item in raw_items:
+        if isinstance(item, dict):
+            content = str(
+                item.get("content")
+                or item.get("text")
+                or item.get("value")
+                or item.get("raw")
+                or ""
+            ).strip()
+            if not content:
+                continue
+            source = str(item.get("source") or item.get("type") or item.get("kind") or "用户输入").strip()
+            note = str(item.get("note") or item.get("path") or "").strip()
+        else:
+            content = str(item).strip()
+            source = "用户输入"
+            note = ""
+        if len(content) > 1800:
+            content = content[:1800].rstrip() + "\n...（已截断）"
+        entry = {"source": source, "content": content}
+        if note:
+            entry["note"] = note
+        normalized.append(entry)
+    return normalized
+
+
+def original_inputs_from_session(summary: SessionSummary) -> list[dict[str, str]]:
+    inputs: list[dict[str, str]] = []
+    for message in user_messages(summary):
+        inputs.append({"source": "会话用户消息", "content": message})
+    return normalize_user_original_inputs(inputs)
+
+
+def user_original_inputs(agent_summary: dict[str, Any] | None, summary: SessionSummary) -> list[dict[str, str]]:
+    if agent_summary:
+        for key in ("user_original_inputs", "original_inputs", "raw_user_inputs"):
+            if agent_summary.get(key):
+                return normalize_user_original_inputs(agent_summary[key])
+        raw_requirements = normalize_string_list(agent_summary.get("raw_requirements"))
+        if raw_requirements:
+            return normalize_user_original_inputs(
+                [{"source": "原始需求描述摘要", "content": item} for item in raw_requirements]
+            )
+    return original_inputs_from_session(summary)
+
+
+def render_user_original_inputs(items: list[dict[str, str]], max_items: int = 12) -> str:
+    if not items:
+        return "- 暂未从会话或 Agent summary 中提取到用户原始输入。"
+    rendered: list[str] = []
+    for index, item in enumerate(items[:max_items], start=1):
+        source = item.get("source") or "用户输入"
+        note = item.get("note") or ""
+        title = f"{index}. 来源：{source}"
+        if note:
+            title += f"（{note}）"
+        rendered.extend([title, "", "```text", item.get("content", ""), "```", ""])
+    if len(items) > max_items:
+        rendered.append(f"（另有 {len(items) - max_items} 条用户原始输入未展示）")
+    return "\n".join(rendered).rstrip()
 
 
 def load_agent_summary(args: argparse.Namespace) -> dict[str, Any] | None:
@@ -402,15 +470,13 @@ def render_markdown(
     theme = str(value_or_default(agent_summary, "task_theme", task_theme(summary))).strip()
     core_requirement = str(value_or_default(agent_summary, "core_requirement", "")).strip()
     raw_requirements = normalize_string_list(value_or_default(agent_summary, "raw_requirements", []))
+    original_inputs = user_original_inputs(agent_summary, summary)
     compatibility_requirements = normalize_string_list(
         value_or_default(agent_summary, "requirements", extract_requirements(summary))
     )
     requirements: list[str] = []
     if core_requirement:
         requirements.append(f"核心需求描述：{core_requirement}")
-    if raw_requirements:
-        requirements.append("原始需求描述：")
-        requirements.extend(raw_requirements)
     if not requirements:
         requirements = compatibility_requirements
     process = normalize_string_list(value_or_default(agent_summary, "execution_process", []))
@@ -435,6 +501,12 @@ def render_markdown(
 ## 任务主题
 
 {theme}
+
+## 用户原始输入
+
+本模块保留用户需求文件内容、命令行输入或会话用户消息等原始输入的可追溯摘录，用于分析用户是否高效使用智能体完成任务。内容应脱敏并按长度截断，不记录 token、cookie、私钥、认证 header 或完整长日志。
+
+{render_user_original_inputs(original_inputs, max_items=12)}
 
 ## 需求描述
 

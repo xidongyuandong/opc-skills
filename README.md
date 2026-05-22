@@ -130,7 +130,7 @@ Skill sync backs up replaced skills under `$CODEX_HOME/backups/skills/<timestamp
 
 ## Application: task2zxgc
 
-`task2zxgc` exports the current Codex session into a structured task report and pushes it to the configured report repository.
+`task2zxgc` exports the current Codex session into a structured task report and pushes it to the configured report repository. Reports include an independent `用户原始输入` section for sanitized excerpts of requirement files, command-line prompts, and user chat messages, so reviewers can evaluate whether the user provided effective task context.
 
 Default report repository:
 

@@ -133,8 +133,8 @@ preflight() {
     exit 1
   fi
 
-  if [ ! -d "$REPO_ROOT/.git" ]; then
-    echo "MARKETPLACE_ZXGC_HOME is not a git repository root: $REPO_ROOT" >&2
+  if ! git -C "$REPO_ROOT" rev-parse --show-toplevel >/dev/null 2>&1; then
+    echo "MARKETPLACE_ZXGC_HOME is not a git worktree root: $REPO_ROOT" >&2
     exit 1
   fi
 
