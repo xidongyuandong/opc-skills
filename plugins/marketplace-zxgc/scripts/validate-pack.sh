@@ -26,6 +26,9 @@ bash -n "$PLUGIN_ROOT/scripts/install-agents-md.sh"
 bash -n "$PLUGIN_ROOT/scripts/install-hooks.sh"
 bash -n "$PLUGIN_ROOT/scripts/install-rules.sh"
 bash -n "$PLUGIN_ROOT/scripts/sync-skills.sh"
+if [ -f "$MARKETPLACE_ROOT/scripts/install-marketplace-zxgc.sh" ]; then
+  bash -n "$MARKETPLACE_ROOT/scripts/install-marketplace-zxgc.sh"
+fi
 
 if command -v python3 >/dev/null 2>&1 && [ -f "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" ]; then
   python3 "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" "$PLUGIN_ROOT/skills/marketplace-zxgc"

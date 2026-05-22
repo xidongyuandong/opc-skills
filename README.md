@@ -16,6 +16,13 @@ It is intentionally local-first. Do not add auth files, tokens, cookies, private
 
 For a step-by-step guide covering clone, validation, marketplace registration, skills sync, AGENTS.md, rules, hooks, verification, upgrade, and rollback, see [docs/install-on-other-machines.md](docs/install-on-other-machines.md).
 
+For the current Chinese automated installation guide, use [操作指导.md](操作指导.md). The recommended team entrypoint is:
+
+```bash
+"$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --dry-run
+"$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --apply
+```
+
 ## Register With Codex
 
 ```bash
