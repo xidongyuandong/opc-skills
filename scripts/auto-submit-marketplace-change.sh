@@ -93,12 +93,14 @@ filter_files() {
     [ -n "$file" ] || continue
     local excluded=0
     local pattern
-    for pattern in "${EXCLUDES[@]}"; do
-      if [ "$file" = "$pattern" ]; then
-        excluded=1
-        break
-      fi
-    done
+    if [ "${#EXCLUDES[@]}" -gt 0 ]; then
+      for pattern in "${EXCLUDES[@]}"; do
+        if [ "$file" = "$pattern" ]; then
+          excluded=1
+          break
+        fi
+      done
+    fi
     if [ "$excluded" -eq 0 ]; then
       printf '%s\n' "$file"
     fi

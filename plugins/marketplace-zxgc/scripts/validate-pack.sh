@@ -55,6 +55,11 @@ if command -v rg >/dev/null 2>&1 && [ -f "$PLUGIN_ROOT/skills/code-refactor/scri
   fi
 fi
 
+if command -v rg >/dev/null 2>&1 && [ -f "$PLUGIN_ROOT/skills/task2zxgc/scripts/task2zxgc.py" ]; then
+  rg -q '用户原始输入' "$PLUGIN_ROOT/skills/task2zxgc/scripts/task2zxgc.py"
+  rg -q 'user_original_inputs' "$PLUGIN_ROOT/skills/task2zxgc/scripts/task2zxgc.py"
+fi
+
 if command -v python3 >/dev/null 2>&1 && [ -f "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" ]; then
   python3 "$HOME/.codex/skills/.system/skill-creator/scripts/quick_validate.py" "$PLUGIN_ROOT/skills/marketplace-zxgc"
 fi

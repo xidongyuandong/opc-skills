@@ -28,6 +28,7 @@ The output path in that repository is:
 The report includes:
 
 - 任务主题
+- 用户原始输入, as an independent module for需求文件内容、命令行输入、会话用户消息等可追溯摘录
 - 需求描述
 - 任务执行过程
 - 完成的任务
@@ -63,6 +64,13 @@ Then, as the Codex Agent, synthesize a JSON object. For a single-topic session, 
   "task_title": "任务051902",
   "task_theme": "用一段话说明此次任务的核心目标。",
   "core_requirement": "对原始需求描述的核心摘要。",
+  "user_original_inputs": [
+    {
+      "source": "需求文件内容 | 命令行输入 | 会话用户消息",
+      "content": "用户原始输入的脱敏摘录。",
+      "note": "可选：文件路径、命令入口或上下文说明。"
+    }
+  ],
   "raw_requirements": ["所有用户输入的可追溯摘要"],
   "requirements": ["兼容字段：归纳后的需求描述"],
   "execution_process": ["按阶段归纳的任务执行过程"],
@@ -92,6 +100,13 @@ For a multi-topic session, use this shape and fill each `reports[]` item with th
       "task_title": "主题一短标题",
       "task_theme": "围绕一个核心主张总结主题一。",
       "core_requirement": "主题一的核心需求摘要。",
+      "user_original_inputs": [
+        {
+          "source": "需求文件内容 | 命令行输入 | 会话用户消息",
+          "content": "主题一相关用户原始输入的脱敏摘录。",
+          "note": "可选来源说明。"
+        }
+      ],
       "raw_requirements": ["主题一相关用户输入的可追溯摘要"],
       "requirements": ["兼容字段：主题一归纳后的需求描述"],
       "execution_process": ["主题一的执行过程"],
@@ -105,6 +120,13 @@ For a multi-topic session, use this shape and fill each `reports[]` item with th
       "task_title": "主题二短标题",
       "task_theme": "围绕另一个独立核心主张总结主题二。",
       "core_requirement": "主题二的核心需求摘要。",
+      "user_original_inputs": [
+        {
+          "source": "需求文件内容 | 命令行输入 | 会话用户消息",
+          "content": "主题二相关用户原始输入的脱敏摘录。",
+          "note": "可选来源说明。"
+        }
+      ],
       "raw_requirements": ["主题二相关用户输入的可追溯摘要"],
       "requirements": ["兼容字段：主题二归纳后的需求描述"],
       "execution_process": ["主题二的执行过程"],
@@ -120,9 +142,11 @@ For a multi-topic session, use this shape and fill each `reports[]` item with th
 
 Use `$AI_INSIGHTS_REPO` as the diagnostic reference. Its useful patterns for this skill are: stable friction taxonomy, attribution/severity/confidence, effective patterns, outcome guidance, prompt-quality dimensions, and evidence sidecar thinking.
 
-`reference_points_ai_insights` is injected by `--dump-context` as internal Agent guidance. Do not render it as a final report section. The final report should show its effect through better `core_requirement`, `raw_requirements`, `completed_tasks`, `execution_result`, `improvement_points`, and `diagnostics`.
+`reference_points_ai_insights` is injected by `--dump-context` as internal Agent guidance. Do not render it as a final report section. The final report should show its effect through better `core_requirement`, `user_original_inputs`, `raw_requirements`, `completed_tasks`, `execution_result`, `improvement_points`, and `diagnostics`.
 
-`requirements` is a compatibility field. Prefer `core_requirement` and `raw_requirements` when generating new Agent summaries.
+`user_original_inputs` is the independent module for user-provided source material. Use it to preserve脱敏后的需求文件内容、命令行输入、关键会话用户消息等原始输入摘录 so reviewers can evaluate whether the user described the task effectively. Do not put secrets, full raw long chats, or unbounded tool output there.
+
+`requirements` is a compatibility field. Prefer `core_requirement`, `user_original_inputs`, and `raw_requirements` when generating new Agent summaries.
 
 Finally push with the Agent-generated summary:
 
