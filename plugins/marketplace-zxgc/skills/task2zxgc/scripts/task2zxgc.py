@@ -263,6 +263,10 @@ def session_context(summary: SessionSummary, ai_insights_repo: Path = DEFAULT_AI
         "reference_points_ai_insights": ai_insights_reference(ai_insights_repo),
         "instructions": {
             "task_title": "短标题，用于 Markdown 标题和文件名；优先保留明确任务编号，例如 任务051902。",
+            "theme_split": "先完整阅读上下文并执行主题拆分。每个报告只能服务一个独立技术主张；如果会话包含多个不能由同一句核心主张统摄的主题，必须输出 reports 数组，每个元素按单主题完整填写。不要只挑选局部重点。",
+            "split_policy": "拆分数量取最小值：能用一个核心主张统摄则单报告；存在多个彼此独立的排障、实现、调研、仓库梳理或治理链路时拆成多个报告；拆分后每篇报告必须能独立阅读。",
+            "material_type": "为每个报告选择主线：debug/troubleshooting、feature implementation、research/decision、repository analysis、general workflow、algorithm direction。",
+            "core_claim": "每个报告的 task_theme/core_requirement 必须能表达对象、判断、价值和边界，避免写成按时间排列的会话流水账。",
             "task_theme": "用 1 段话总结本次任务的核心目标，不要复制原始消息。",
             "requirements": "用条目归纳用户需求描述，可以保留关键路径、仓库、命令和约束。",
             "execution_process": "按阶段归纳任务执行过程，说明关键决策、实现步骤和验证动作，不要列原始工具流水账。",
@@ -272,6 +276,7 @@ def session_context(summary: SessionSummary, ai_insights_repo: Path = DEFAULT_AI
             "diagnostics": "对需求描述、任务执行过程、执行结果做全方位诊断；建议包含 category、attribution、severity、confidence、description、suggested_action。",
             "reference_points_ai_insights": "内部参考输入；用于提升各总结维度质量，不要作为 Agent summary 字段输出，也不要渲染成 Markdown 章节。",
             "evidence": "少量证据摘要，用于说明归纳依据。",
+            "multi_report_shape": "多主题时输出 {\"reports\": [{...单报告字段...}, {...单报告字段...}]}；单主题时仍可输出原兼容 JSON object。",
         },
     }
 
@@ -317,6 +322,24 @@ def load_agent_summary(args: argparse.Namespace) -> dict[str, Any] | None:
     if not isinstance(data, dict):
         raise SystemExit("Agent summary must be a JSON object.")
     return data
+
+
+def agent_reports(agent_summary: dict[str, Any] | None) -> list[dict[str, Any] | None]:
+    if not agent_summary:
+        return [None]
+    reports = agent_summary.get("reports")
+    if reports is None:
+        reports = agent_summary.get("summaries")
+    if reports is None:
+        return [agent_summary]
+    if not isinstance(reports, list) or not reports:
+        raise SystemExit("Agent summary field 'reports' must be a non-empty list when provided.")
+    normalized: list[dict[str, Any]] = []
+    for index, report in enumerate(reports, start=1):
+        if not isinstance(report, dict):
+            raise SystemExit(f"Agent summary report #{index} must be a JSON object.")
+        normalized.append(report)
+    return normalized
 
 
 def value_or_default(agent_summary: dict[str, Any] | None, key: str, default: Any) -> Any:
@@ -419,8 +442,30 @@ def commit_and_push(repo_dir: Path, relative_path: Path, title: str) -> str:
     return "pushed"
 
 
-def write_report(content: str, repo_dir: Path, user: str, title: str, dt: datetime) -> Path:
-    relative = Path(user) / f"{dt.strftime('%Y-%m-%d-%H')}-{sanitize_path_part(title, 'codex-session-summary')}.md"
+def commit_and_push_many(repo_dir: Path, relative_paths: list[Path], title: str) -> str:
+    run(["git", "add", *[str(path) for path in relative_paths]], cwd=repo_dir)
+    diff = run(["git", "diff", "--cached", "--quiet"], cwd=repo_dir, check=False)
+    if diff.returncode == 0:
+        return "no changes to commit"
+    suffix = f" and {len(relative_paths) - 1} more" if len(relative_paths) > 1 else ""
+    run(["git", "commit", "-m", f"task2zxgc: {title}{suffix}"], cwd=repo_dir)
+    run(["git", "push"], cwd=repo_dir)
+    return "pushed"
+
+
+def report_relative_path(repo_dir: Path, user: str, title: str, dt: datetime, used: set[Path]) -> Path:
+    base = Path(user) / f"{dt.strftime('%Y-%m-%d-%H')}-{sanitize_path_part(title, 'codex-session-summary')}.md"
+    relative = base
+    counter = 2
+    while relative in used or (repo_dir / relative).exists():
+        relative = base.with_name(f"{base.stem}-{counter}{base.suffix}")
+        counter += 1
+    used.add(relative)
+    return relative
+
+
+def write_report(content: str, repo_dir: Path, user: str, title: str, dt: datetime, used: set[Path] | None = None) -> Path:
+    relative = report_relative_path(repo_dir, user, title, dt, used or set())
     target = repo_dir / relative
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content, encoding="utf-8")
@@ -484,17 +529,24 @@ def main() -> int:
         raise SystemExit("Refusing to push without Agent-generated summary. Use --agent-summary-file/--agent-summary-json/--agent-summary-stdin.")
     user = username()
     now = datetime.now()
-    title, content = render_markdown(summary, user, now, args.repo_url, agent_summary)
+    rendered_reports = [render_markdown(summary, user, now, args.repo_url, report) for report in agent_reports(agent_summary)]
 
     if args.dry_run or not args.push:
-        print(content)
+        for index, (_title, content) in enumerate(rendered_reports, start=1):
+            if len(rendered_reports) > 1:
+                print(f"<!-- task2zxgc report {index}/{len(rendered_reports)} -->")
+            print(content)
         return 0
 
     repo_dir = Path(args.repo_dir).expanduser()
     ensure_repo(args.repo_url, repo_dir)
-    relative_path = write_report(content, repo_dir, user, title, now)
-    status = commit_and_push(repo_dir, relative_path, title)
-    print(f"task2zxgc {status}: {repo_dir / relative_path}")
+    used_paths: set[Path] = set()
+    relative_paths: list[Path] = []
+    for title, content in rendered_reports:
+        relative_paths.append(write_report(content, repo_dir, user, title, now, used_paths))
+    status = commit_and_push_many(repo_dir, relative_paths, rendered_reports[0][0])
+    for relative_path in relative_paths:
+        print(f"task2zxgc {status}: {repo_dir / relative_path}")
     return 0
 
 
