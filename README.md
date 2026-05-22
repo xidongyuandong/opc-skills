@@ -23,6 +23,8 @@ For the current Chinese automated installation guide, use [操作指导.md](操�
 "$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --apply
 ```
 
+For a Chinese overview of packaged skills and when to use them, see [技能介绍.md](技能介绍.md).
+
 ## Register With Codex
 
 ```bash
