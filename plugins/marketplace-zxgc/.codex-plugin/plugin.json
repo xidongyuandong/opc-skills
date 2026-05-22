@@ -1,0 +1,45 @@
+{
+  "name": "marketplace-zxgc",
+  "version": "0.1.0",
+  "description": "Personal Codex capability pack for ZXGC workflows: custom skills, AGENTS templates, hooks, and maintenance scripts.",
+  "author": {
+    "name": "zhengyuyu",
+    "email": "local-only@example.com",
+    "url": "https://example.com/marketplace-zxgc"
+  },
+  "homepage": "https://example.com/marketplace-zxgc",
+  "repository": "local:/Users/zhengyuyu/marketplace-zxgc",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "hooks",
+    "agents",
+    "zxgc"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks.json",
+  "mcpServers": "./.mcp.json",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "ZXGC Agent Pack",
+    "shortDescription": "Custom Codex skills, hooks, scripts, and AGENTS templates",
+    "longDescription": "A local-first plugin pack that turns ZXGC personal Codex workflows into a maintainable marketplace asset. It packages selected custom skills, learning hooks, AGENTS.md templates, and safe install/sync scripts without including secrets or auth files.",
+    "developerName": "zhengyuyu",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://example.com/marketplace-zxgc",
+    "privacyPolicyURL": "https://example.com/privacy",
+    "termsOfServiceURL": "https://example.com/terms",
+    "defaultPrompt": [
+      "Use marketplace-zxgc to manage my Codex skills",
+      "Sync ZXGC skills into this Codex home",
+      "Install the ZXGC AGENTS.md template"
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/codex_learning_hook.py --event SessionStart",
+            "timeout": 10,
+            "statusMessage": "Loading ZXGC learning context"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/codex_learning_hook.py --event UserPromptSubmit",
+            "timeout": 10,
+            "statusMessage": "Capturing prompt for ZXGC learning"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/codex_learning_hook.py --event PreToolUse",
+            "timeout": 10,
+            "statusMessage": "Observing tool start"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/codex_learning_hook.py --event PermissionRequest",
+            "timeout": 10,
+            "statusMessage": "Capturing approval pattern"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/codex_learning_hook.py --event PostToolUse",
+            "timeout": 10,
+            "statusMessage": "Observing tool result"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/codex_learning_hook.py --event Stop",
+            "timeout": 10,
+            "statusMessage": "Writing ZXGC learning candidates"
+          },
+          {
+            "type": "command",
+            "command": "python3 {{PLUGIN_ROOT}}/hooks/task2zxgc_posthook.py --event Stop",
+            "timeout": 30,
+            "statusMessage": "Checking task2zxgc export request"
+          }
+        ]
+      }
+    ]
+  }
+}

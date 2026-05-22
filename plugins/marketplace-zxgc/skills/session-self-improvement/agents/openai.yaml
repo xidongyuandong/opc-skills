@@ -1,0 +1,4 @@
+interface:
+  display_name: "Session Self Improvement"
+  short_description: "Review sessions or proposed ideas and decide whether to update memory, constraints, rules, AGENTS.md, or skills."
+  default_prompt: "Use session-self-improvement to review the current session or a proposed idea, weigh durable value against negative side effects with contradiction-analysis and criticism-self-criticism, then apply only justified updates to memory, rules, AGENTS.md, or skills."

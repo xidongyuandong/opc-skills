@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Hook"
+  short_description: "Create, validate, and troubleshoot Codex lifecycle hooks."
+  default_prompt: "Use codex-hook to inspect and update Codex hooks safely, preserving existing entries and validating hooks.json and related scripts."

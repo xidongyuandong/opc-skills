@@ -1,0 +1,20 @@
+{
+  "name": "marketplace-zxgc",
+  "interface": {
+    "displayName": "ZXGC Agent Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "marketplace-zxgc",
+      "source": {
+        "source": "local",
+        "path": "./plugins/marketplace-zxgc"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
