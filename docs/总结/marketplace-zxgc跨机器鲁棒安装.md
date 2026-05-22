@@ -4,6 +4,8 @@
 
 `marketplace-zxgc` 在其他机器安装时，主要风险来自人工串联多个局部脚本导致漏步；应以一个可 dry-run、可 apply、可 smoke-test 的总控脚本作为团队安装入口，再用中文操作指导解释配置、验证和回滚。
 
+未来读者任务：当团队成员需要在新机器、远程开发机或 c250/container 环境安装 marketplace-zxgc 时，先按本文理解风险边界，再使用 `scripts/install-marketplace-zxgc.sh` 和 `操作指导.md` 完成自动化安装与验证。
+
 ## 证据
 
 - c250/container250 的 `CODEX_HOME` 是 `/data/jenkins/.codex/home`，不是默认 `$HOME/.codex`。如果安装脚本没有显式使用 `CODEX_HOME`，skills、rules、hooks 会落到错误目录。
@@ -68,3 +70,5 @@ git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLA
 - smoke test 使用 `--dangerously-bypass-hook-trust` 仅用于受控安装验证，不应作为日常 Codex 启动方式。
 - 安装流程不保存 GitLab token、Codex auth、cookie、私钥或任何机器登录态。
 - 目标机器缺少 `jq` 时应先安装依赖，不应跳过 hooks/JSON 校验。
+
+不持久化内容：不写入 c250 的一次性命令输出、Codex smoke test 原始长日志、个人 token 配置、`auth.json`、具体会话状态或临时备份目录；这些只作为本次验证证据，不进入全局 AGENTS 或用户级 rules。
