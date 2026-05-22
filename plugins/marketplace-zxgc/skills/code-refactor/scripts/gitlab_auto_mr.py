@@ -51,31 +51,96 @@ def truncate_lines(text, max_lines=40, max_chars=6000):
     return truncated
 
 
+def changed_file_summary(name_status):
+    categories = []
+    files = []
+    for line in name_status.splitlines():
+        parts = line.split(maxsplit=1)
+        if len(parts) == 2:
+            files.append(parts[1])
+        elif parts:
+            files.append(parts[0])
+    checks = [
+        ("脚本/自动化流程", ("scripts/", ".sh", ".py")),
+        ("技能说明或执行流程", ("skills/", "SKILL.md", "commands/")),
+        ("安装/操作文档", ("README", "docs/", "操作指导", "技能介绍")),
+        ("Codex 约束模板", ("templates/", "AGENTS", "rules")),
+        ("校验逻辑", ("validate", "test", "check")),
+    ]
+    for label, needles in checks:
+        if any(any(needle in path for needle in needles) for path in files):
+            categories.append(label)
+    return files, categories
+
+
+def bullet_from_commit_subject(subject):
+    text = subject
+    for prefix in ("feat:", "fix:", "docs:", "chore:", "refactor:", "test:"):
+        if text.lower().startswith(prefix):
+            text = text[len(prefix):].strip()
+            break
+    if not text:
+        return ""
+    return f"- {text}"
+
+
 def build_change_summary(source_branch, target_branch):
     base_ref = first_existing_ref([f"origin/{target_branch}", target_branch])
     source_ref = first_existing_ref([source_branch, "HEAD"]) or "HEAD"
     if not base_ref:
         head_subject = try_git(["log", "-1", "--pretty=format:%h %s"]) or "unavailable"
-        return f"## Change Summary\n\n- Base ref `{target_branch}` was not available locally.\n- HEAD: {head_subject}"
+        return (
+            "## 变更概览\n\n"
+            f"本次 MR 基于 `{source_branch}` 提交，目标分支为 `{target_branch}`。"
+            "本地未找到可用于对比的目标分支引用，因此只记录当前 HEAD。\n\n"
+            "## 相关提交\n\n"
+            f"```text\n{head_subject}\n```"
+        )
 
     commit_log = try_git(["log", "--oneline", "--no-merges", f"{base_ref}..{source_ref}"])
-    diff_stat = try_git(["diff", "--stat", f"{base_ref}...{source_ref}"])
     name_status = try_git(["diff", "--name-status", f"{base_ref}...{source_ref}"])
-    if not commit_log and not diff_stat and not name_status:
+    if not commit_log and not name_status:
         commit_log = try_git(["log", "-1", "--pretty=format:%h %s"])
 
+    files, categories = changed_file_summary(name_status)
+    commit_subjects = []
+    for line in commit_log.splitlines():
+        parts = line.split(maxsplit=1)
+        if len(parts) == 2:
+            commit_subjects.append(parts[1])
+    main_changes = [bullet_from_commit_subject(subject) for subject in commit_subjects]
+    main_changes = [item for item in main_changes if item]
+    if not main_changes:
+        main_changes = ["- 整理当前分支相对目标分支的变更，保持 MR 内容可 review。"]
+
+    scope = "、".join(categories) if categories else "当前分支涉及的文件"
+    changed_files_text = truncate_lines(name_status, max_lines=40) if name_status else "No changed files detected"
+    commits_text = truncate_lines(commit_log, max_lines=20) if commit_log else "No commit log detected"
+
     sections = [
-        "## Change Summary",
+        "## 变更概览",
         "",
-        f"- Source branch: `{source_branch}`",
-        f"- Target branch: `{target_branch}`",
+        f"本次 MR 从 `{source_branch}` 合入 `{target_branch}`，主要处理：{scope}。",
+        "摘要聚焦变更目的和 review 关注点；文件级增删统计请在 GitLab Changes 页查看。",
+        "",
+        "## 主要改动",
+        "",
+        *main_changes[:8],
+        "",
+        "## 影响范围",
+        "",
+        f"- 影响模块：{scope}。",
+        "- 变更会随 MR 合入目标分支后生效；如涉及脚本或模板，使用方需要重新拉取并执行对应安装/同步流程。",
+        "",
+        "## 验证建议",
+        "",
+        "- 检查 MR Changes 页确认文件级 diff 符合预期。",
+        "- 根据仓库类型运行对应的校验脚本、dry-run 或单元测试。",
     ]
     if commit_log:
-        sections.extend(["", "### Commits", "", "```text", truncate_lines(commit_log, max_lines=20), "```"])
-    if diff_stat:
-        sections.extend(["", "### Diff Stat", "", "```text", truncate_lines(diff_stat, max_lines=30), "```"])
+        sections.extend(["", "## 相关提交", "", "```text", commits_text, "```"])
     if name_status:
-        sections.extend(["", "### Changed Files", "", "```text", truncate_lines(name_status, max_lines=40), "```"])
+        sections.extend(["", "## 涉及文件", "", "```text", changed_files_text, "```"])
     return "\n".join(sections)
 
 

@@ -15,7 +15,7 @@ Create and manage a review-ready GitLab merge request from a local repository, i
 - Do not print tokens, `auth.json`, or unredacted credential files.
 - Prefer HTTPS GitLab remotes with `git credential fill`.
 - A completed MR must be `opened`, not Draft/WIP, have a pushed source branch, and have a related issue.
-- A completed MR must include a readable change summary, including the intent of the change, commit list, diff stat, and changed files when available. Do not leave the MR description as only `Closes #N`, branch names, and HEAD.
+- A completed MR must include a readable Chinese overview that explains the intent, main changes, impact scope, and verification suggestions. Do not use the overview to merely repeat diff stat; GitLab already shows file-level statistics in the Changes tab.
 - `approve` does not close issues. GitLab closes issues after merge when the MR description or commit message contains `Closes #N`, `Fixes #N`, or `Resolves #N`.
 - Target the GitLab project default branch by default. If a requested target branch is not the project default branch, stop and explain that issue auto-close may not run unless the user explicitly accepts a non-default target.
 - For multiple repositories or worktrees, complete the full checklist per path. Do not count a worktree as done until its intended branch has committed changes, an upstream remote branch, and a matching MR.
@@ -61,7 +61,7 @@ Create and manage a review-ready GitLab merge request from a local repository, i
    ```
 
    Pass `--target-branch <target-branch>` only when the requested target is explicit. The helper defaults to the GitLab project default branch and rejects non-default targets unless `--allow-non-default-target` is provided.
-   The helper automatically appends a `Change Summary` section built from local Git commits, diff stat, and changed files. If the local Git range is unavailable or a more domain-specific summary is needed, pass `--change-summary` or `--change-summary-file`.
+   The helper automatically appends Chinese overview sections built from local Git commits and changed-file categories. If the local Git range is unavailable or a more domain-specific summary is needed, pass `--change-summary` or `--change-summary-file`.
 
    Reuse existing objects when appropriate:
    ```bash
@@ -79,7 +79,8 @@ Create and manage a review-ready GitLab merge request from a local repository, i
    - `detailed_merge_status` is acceptable or reported as a blocker.
    - `related_merge_requests` contains the MR.
    - MR description includes both a readable issue title and `Closes #N`.
-   - MR description includes `Change Summary`, `Commits`, `Diff Stat`, and changed-file context when the local Git range is available.
+   - MR description includes `变更概览`, `主要改动`, `影响范围`, and `验证建议`.
+   - MR overview does not include `Diff Stat`; reviewers can inspect file-level statistics in the GitLab Changes tab.
    - `target_branch` equals `default_branch` unless a non-default target was explicitly accepted.
    - `warnings` is empty, or any warning is explained in the final response.
 
@@ -95,24 +96,27 @@ Target branch: target/name
 
 HEAD: abc1234 commit subject
 
-## Change Summary
+## 变更概览
 
-### Commits
+本次 MR 从 `source/name` 合入 `target/name`，主要处理：脚本/自动化流程。
+摘要聚焦变更目的和 review 关注点；文件级增删统计请在 GitLab Changes 页查看。
+
+## 主要改动
+
+- add meaningful behavior summary here
+
+## 影响范围
+
+- 影响模块：脚本/自动化流程。
+
+## 验证建议
+
+- 检查 MR Changes 页确认文件级 diff 符合预期。
+
+## 相关提交
 
 ```text
 abc1234 commit subject
-```
-
-### Diff Stat
-
-```text
-path/to/file | 10 +++++-----
-```
-
-### Changed Files
-
-```text
-M	path/to/file
 ```
 ```
 
