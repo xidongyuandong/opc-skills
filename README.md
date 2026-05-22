@@ -110,6 +110,8 @@ The initial pack includes:
 
 `task2zxgc` is kept marketplace-local as the single source of truth. It is not synced into `~/.codex/skills` by default.
 
+Skill sync backs up replaced skills under `$CODEX_HOME/backups/skills/<timestamp>/` and also moves known deprecated skill stubs out of the active skills directory.
+
 ## Application: task2zxgc
 
 `task2zxgc` exports the current Codex session into a structured task report and pushes it to the configured report repository.

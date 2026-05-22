@@ -155,6 +155,8 @@ ZXGC_LINK_SKILLS="marketplace-zxgc code-refactor" \
 
 注意：脚本会在覆盖已有 skill 前生成时间戳备份，备份位置是 `$CODEX_HOME/backups/skills/<timestamp>/`。备份不会放在 `$CODEX_HOME/skills` 下，避免旧 skill 被误发现或污染扫描结果。
 
+同步脚本也会清理已迁移或废弃的已知旧 skill，例如 `auto-merge-request.moved-to-code-refactor.20260521`。清理动作同样会先移动到 `$CODEX_HOME/backups/skills/<timestamp>/`，不会直接删除。
+
 ## 5. 安装 AGENTS.md 模板
 
 AGENTS.md 会影响 Codex 的用户级行为约束。先预览：

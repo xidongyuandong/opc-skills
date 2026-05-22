@@ -101,6 +101,7 @@ python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.j
 ```
 
 Existing skills are backed up under `$CODEX_HOME/backups/skills/<timestamp>/` before replacement. Backups are intentionally kept outside `$CODEX_HOME/skills` so old skill copies are not rediscovered as active skills.
+Known deprecated skill stubs, such as `auto-merge-request.moved-to-code-refactor.20260521`, are also moved into the same backup area during sync.
 
 Limit skills:
 
