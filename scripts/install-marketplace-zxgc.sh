@@ -136,8 +136,8 @@ verify_installation() {
   test -f "$CODEX_HOME/skills/session-self-improvement/SKILL.md"
 
   stale_count="$(
-    find "$CODEX_HOME/skills" -maxdepth 2 -name SKILL.md -print 2>/dev/null |
-      grep -E 'bak|backup|moved|deprecated|auto-merge-request' |
+    { find "$CODEX_HOME/skills" -maxdepth 2 -name SKILL.md -print 2>/dev/null |
+      grep -E 'bak|backup|moved|deprecated|auto-merge-request' || true; } |
       wc -l |
       tr -d ' '
   )"
