@@ -109,3 +109,38 @@ The initial pack includes:
 - `task2zxgc`
 
 `task2zxgc` is kept marketplace-local as the single source of truth. It is not synced into `~/.codex/skills` by default.
+
+## Application: task2zxgc
+
+`task2zxgc` exports the current Codex session into a structured task report and pushes it to the configured report repository.
+
+Default report repository:
+
+```text
+https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git
+```
+
+Default GitLab report URL pattern:
+
+```text
+https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment/-/blob/master/{username}/{YYYY-MM-DD-HH}-{task-title}.md
+```
+
+Runtime configuration is local to each machine:
+
+```bash
+export TASK2ZXGC_REPO_URL="https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git"
+export TASK2ZXGC_REPO_DIR="${CODEX_HOME:-$HOME/.codex}/task2zxgc/ai-coding-zxgc-managment"
+export TASK2ZXGC_USERNAME="$(git config user.name 2>/dev/null || whoami)"
+```
+
+Manual flow:
+
+```bash
+TASK2ZXGC_SCRIPT="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --dump-context > /tmp/task2zxgc-context.json
+python3 "$TASK2ZXGC_SCRIPT" --dry-run --agent-summary-file /tmp/task2zxgc-summary.json
+python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.json
+```
+
+See [docs/install-on-other-machines.md](docs/install-on-other-machines.md#9-task2zxgc-应用说明) for team installation, posthook usage, and credential notes.

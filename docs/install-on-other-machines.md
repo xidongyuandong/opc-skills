@@ -244,7 +244,73 @@ $code-refactor
 
 如果 skill 只被命名而没有明确任务，Codex 应只解释或使用该 skill 处理当前显式任务，不应推断为允许执行无关副作用操作。
 
-## 9. 日常使用
+## 9. task2zxgc 应用说明
+
+`task2zxgc` 用于把当前 Codex 会话整理为结构化任务报告，并提交到团队任务沉淀仓库。它适合在完成一次实现、排障、调研、代码梳理或流程优化后，把“需求、执行过程、完成结果、待优化点、诊断和证据摘要”沉淀为可检索 Markdown。
+
+默认提交目标：
+
+```text
+https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git
+```
+
+默认文件路径：
+
+```text
+{username}/{YYYY-MM-DD-HH}-{task-title}.md
+```
+
+报告元信息会把本机 Codex session 路径显示为 `$CODEX_HOME/...` 或 `$HOME/...`，避免把个人机器绝对路径提交到团队仓库。
+
+`username` 默认来自 `TASK2ZXGC_USERNAME`、`TASK2ZXGC_AUTHOR`、`git config user.name` 或系统用户名。团队成员可以在本机显式配置，避免不同机器或容器里用户名不稳定：
+
+```bash
+export TASK2ZXGC_REPO_URL="https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git"
+export TASK2ZXGC_REPO_DIR="$CODEX_HOME/task2zxgc/ai-coding-zxgc-managment"
+export TASK2ZXGC_USERNAME="$(git config user.name 2>/dev/null || whoami)"
+export AI_INSIGHTS_REPO="${AI_INSIGHTS_REPO:-$HOME/ai-insights}"
+```
+
+如果团队使用另一个报告仓库，只改本机 `TASK2ZXGC_REPO_URL` 和 `TASK2ZXGC_REPO_DIR`，不要修改并提交个人配置。
+
+一次完整手动使用流程：
+
+```bash
+TASK2ZXGC_SCRIPT="$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --dump-context > /tmp/task2zxgc-context.json
+```
+
+把 `/tmp/task2zxgc-context.json` 交给当前 Codex Agent 归纳为 Agent summary JSON。单主题输出一个 JSON object；多主题输出 `{"reports":[...]}`。然后先 dry-run：
+
+```bash
+python3 "$TASK2ZXGC_SCRIPT" --dry-run --agent-summary-file /tmp/task2zxgc-summary.json
+```
+
+确认报告内容后推送：
+
+```bash
+python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.json
+```
+
+推送成功后，脚本会输出本次生成的本地文件路径；对应 GitLab URL 可按默认仓库和相对路径拼接，例如：
+
+```text
+https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment/-/blob/master/{username}/{YYYY-MM-DD-HH}-{task-title}.md
+```
+
+如果默认分支不是 `master`，以目标报告仓库实际默认分支为准。
+
+使用 posthook 延迟到 Codex Stop 时执行：
+
+```bash
+python3 "$TASK2ZXGC_SCRIPT" --request-posthook --agent-summary-file /tmp/task2zxgc-summary.json
+```
+
+posthook 默认空闲，只有存在 `$TASK2ZXGC_STATE_DIR/pending.json` 时才会提交报告。这样不会让每次 Codex 退出都自动产生 Git commit。
+
+GitLab 认证不由 `task2zxgc` 保存。目标机器需要提前配置 Git credential helper、SSH key，或在本机 shell 环境中提供凭据；不要把 token 写入仓库 URL、文档或 committed env 文件。
+
+## 10. 日常使用
 
 常用命令：
 
@@ -265,7 +331,7 @@ CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/script
 
 如更新了 AGENTS.md、rules 或 hooks 模板，分别重新执行对应 dry-run 和 apply。
 
-## 10. 维护者推送配置
+## 11. 维护者推送配置
 
 普通安装和使用不需要配置 GitLab token。只有需要从本机向 `marketplace-zxgc` 远端提交维护变更时，才需要配置推送凭据。
 
@@ -300,7 +366,7 @@ MARKETPLACE_ZXGC_ENV_FILE="$HOME/private/marketplace-zxgc.env" \
   "$MARKETPLACE_ZXGC_HOME/scripts/push-marketplace.sh"
 ```
 
-## 11. 卸载或回滚
+## 12. 卸载或回滚
 
 从 Codex marketplace 移除注册：
 

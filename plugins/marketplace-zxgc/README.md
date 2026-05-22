@@ -67,6 +67,39 @@ The algorithm engineering skill set is included in the default sync set:
 
 `task2zxgc` is intentionally excluded from the default sync set so the marketplace copy remains the only maintained copy.
 
+## Application: task2zxgc
+
+`task2zxgc` turns the current Codex session into a structured task report and pushes it to a configured report Git repository.
+
+Default target:
+
+```text
+https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git
+```
+
+Default GitLab URL pattern after push:
+
+```text
+https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment/-/blob/master/{username}/{YYYY-MM-DD-HH}-{task-title}.md
+```
+
+Use local environment variables for team machines:
+
+```bash
+export TASK2ZXGC_REPO_URL="https://gitlab.chehejia.com/ep/ai/ai-coding-zxgc-managment.git"
+export TASK2ZXGC_REPO_DIR="${CODEX_HOME:-$HOME/.codex}/task2zxgc/ai-coding-zxgc-managment"
+export TASK2ZXGC_USERNAME="$(git config user.name 2>/dev/null || whoami)"
+```
+
+Manual flow:
+
+```bash
+TASK2ZXGC_SCRIPT="${MARKETPLACE_ZXGC_HOME:-$HOME/marketplace-zxgc}/plugins/marketplace-zxgc/skills/task2zxgc/scripts/task2zxgc.py"
+python3 "$TASK2ZXGC_SCRIPT" --dump-context > /tmp/task2zxgc-context.json
+python3 "$TASK2ZXGC_SCRIPT" --dry-run --agent-summary-file /tmp/task2zxgc-summary.json
+python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.json
+```
+
 Existing skills are backed up under `$CODEX_HOME/backups/skills/<timestamp>/` before replacement. Backups are intentionally kept outside `$CODEX_HOME/skills` so old skill copies are not rediscovered as active skills.
 
 Limit skills:
