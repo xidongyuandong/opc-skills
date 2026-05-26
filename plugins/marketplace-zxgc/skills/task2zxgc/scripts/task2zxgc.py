@@ -61,6 +61,7 @@ class SessionSummary:
     session_path: Path
     session_id: str = ""
     user_messages: list[str] = field(default_factory=list)
+    raw_user_inputs: list[str] = field(default_factory=list)
     assistant_finals: list[str] = field(default_factory=list)
     tool_events: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
@@ -132,7 +133,7 @@ def text_from_content(content: Any) -> str:
                     parts.append(text)
             elif isinstance(item, str):
                 parts.append(item)
-        return "\n".join(parts).strip()
+        return "\n".join(parts)
     return ""
 
 
@@ -146,8 +147,14 @@ def append_unique(items: list[str], text: str, limit: int = 4000) -> None:
         items.append(text)
 
 
+def append_raw(items: list[str], text: str) -> None:
+    if text:
+        items.append(text)
+
+
 def parse_session(path: Path) -> SessionSummary:
     summary = SessionSummary(session_path=path)
+    fallback_user_inputs: list[str] = []
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
             if not line.strip():
@@ -169,6 +176,7 @@ def parse_session(path: Path) -> SessionSummary:
                 role = item.get("role")
                 text = text_from_content(item.get("content"))
                 if role == "user":
+                    append_raw(summary.raw_user_inputs, text)
                     append_unique(summary.user_messages, text)
                 elif role == "assistant":
                     append_unique(summary.assistant_finals, text, limit=2500)
@@ -176,6 +184,7 @@ def parse_session(path: Path) -> SessionSummary:
             if event_type == "event_msg":
                 msg = str(payload.get("message") or payload.get("text") or "")
                 if payload.get("type") == "user_message":
+                    append_raw(fallback_user_inputs, msg)
                     append_unique(summary.user_messages, msg)
                 elif payload.get("type") == "agent_message" and payload.get("phase") == "final_answer":
                     append_unique(summary.assistant_finals, msg, limit=2500)
@@ -196,6 +205,8 @@ def parse_session(path: Path) -> SessionSummary:
                         if re.search(r"\b(error|failed|permission denied|operation not permitted|traceback)\b", output, re.I):
                             append_unique(summary.errors, output, limit=800)
 
+    if not summary.raw_user_inputs:
+        summary.raw_user_inputs = fallback_user_inputs
     return summary
 
 
@@ -218,6 +229,56 @@ def is_internal_message(text: str) -> bool:
 
 def user_messages(summary: SessionSummary) -> list[str]:
     return [message for message in summary.user_messages if not is_internal_message(message)]
+
+
+def raw_user_inputs(summary: SessionSummary) -> list[str]:
+    return [message for message in summary.raw_user_inputs if not is_internal_message(message)]
+
+
+def redact_sensitive_text(text: str) -> str:
+    redacted = re.sub(
+        r"(?i)\b(password|passwd|pwd|token|api[_-]?key|secret|cookie|authorization)\b\s*[:=]\s*([^\s,;]+)",
+        r"\1=[REDACTED]",
+        text,
+    )
+    redacted = re.sub(
+        r"(密码|口令|密钥|令牌)\s*(?:是|为)?\s*[：:=]\s*[\s\S]*?(?=$|[，,；;。])",
+        r"\1=[REDACTED]",
+        redacted,
+    )
+    redacted = re.sub(r"(?i)\b(bearer|basic)\s+[A-Za-z0-9._~+/=-]{12,}", r"\1 [REDACTED]", redacted)
+
+    stripped = redacted.strip()
+    if re.fullmatch(r"[A-Za-z0-9_.@-]{2,64}\s+[A-Za-z0-9!@#$%^&*()_+=,.?-]{8,}", stripped):
+        first, second = stripped.split(maxsplit=1)
+        if re.search(r"[A-Za-z]", second) and re.search(r"\d", second):
+            return f"{first} [REDACTED]"
+    return redacted
+
+
+def compact_user_input(text: str, limit: int = 500) -> str:
+    text = redact_sensitive_text(text)
+    if len(text) <= limit:
+        return text
+    omitted = len(text) - limit
+    return f"{text[:limit]}\n\n...（已缩略 {omitted} 字）"
+
+
+def markdown_code_fence(text: str) -> str:
+    max_backticks = max((len(match.group(0)) for match in re.finditer(r"`+", text)), default=0)
+    return "`" * max(3, max_backticks + 1)
+
+
+def render_user_inputs(summary: SessionSummary, limit: int = 500) -> str:
+    messages = raw_user_inputs(summary)
+    if not messages:
+        return "- 暂未从会话中提取到用户输入。"
+    sections: list[str] = []
+    for index, message in enumerate(messages, start=1):
+        rendered = compact_user_input(message, limit=limit)
+        fence = markdown_code_fence(rendered)
+        sections.extend([f"### 用户输入 {index}", "", f"{fence}text", rendered, fence, ""])
+    return "\n".join(sections).rstrip()
 
 
 def task_title(summary: SessionSummary) -> str:
@@ -301,6 +362,7 @@ def session_context(summary: SessionSummary, ai_insights_repo: Path = DEFAULT_AI
         "session_id": summary.session_id,
         "session_path": display_path(summary.session_path),
         "user_messages": user_messages(summary),
+        "raw_user_inputs": raw_user_inputs(summary),
         "assistant_final_messages": summary.assistant_finals,
         "tool_event_samples": summary.tool_events[-20:],
         "reference_points_ai_insights": ai_insights_reference(ai_insights_repo),
@@ -511,6 +573,10 @@ def render_markdown(
 ## 需求描述
 
 {bulletize(requirements, max_items=20)}
+
+## 用户输入逐条记录
+
+{render_user_inputs(summary)}
 
 ## 任务执行过程
 
