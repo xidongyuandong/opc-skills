@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auto Issue"
+  short_description: "Draft and submit structured GitLab issues"
+  default_prompt: "Use $auto-issue to turn this context into a structured GitLab issue."

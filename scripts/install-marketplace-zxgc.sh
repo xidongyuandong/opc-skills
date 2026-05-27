@@ -122,6 +122,25 @@ run_step() {
   "$@"
 }
 
+supports_installed_plugin_commands() {
+  "$CODEX_BIN" plugin add --help >/dev/null 2>&1 &&
+    "$CODEX_BIN" plugin list --help >/dev/null 2>&1
+}
+
+refresh_marketplace_registration() {
+  run_step "$CODEX_BIN" plugin marketplace add "$REPO_ROOT"
+  if supports_installed_plugin_commands; then
+    "$CODEX_BIN" plugin remove marketplace-zxgc@marketplace-zxgc >/dev/null 2>&1 || true
+    run_step "$CODEX_BIN" plugin add marketplace-zxgc@marketplace-zxgc
+  else
+    echo
+    echo "==> $CODEX_BIN plugin marketplace upgrade marketplace-zxgc"
+    if ! "$CODEX_BIN" plugin marketplace upgrade marketplace-zxgc; then
+      echo "Marketplace upgrade is unavailable for this local marketplace; continuing after marketplace add."
+    fi
+  fi
+}
+
 preflight() {
   require_command git
   require_command bash
@@ -183,7 +202,11 @@ verify_installation() {
     exit 1
   fi
 
-  "$CODEX_BIN" plugin list | grep -q 'marketplace-zxgc@marketplace-zxgc (installed, enabled)'
+  if supports_installed_plugin_commands; then
+    "$CODEX_BIN" plugin list | grep -q 'marketplace-zxgc@marketplace-zxgc (installed, enabled)'
+  else
+    "$CODEX_BIN" plugin marketplace add "$REPO_ROOT" >/dev/null
+  fi
   echo "Installation verification passed"
 }
 
@@ -193,11 +216,18 @@ run_smoke_test() {
   fi
   echo
   echo "==> codex smoke test"
-  if CODEX_HOME="$CODEX_HOME" "$CODEX_BIN" exec \
-      --dangerously-bypass-hook-trust \
-      --skip-git-repo-check \
-      --sandbox read-only \
-      "只输出 marketplace-zxgc smoke ok"; then
+  local smoke_cmd=(
+    "$CODEX_BIN" exec
+    --skip-git-repo-check
+  )
+  if "$CODEX_BIN" exec --help 2>/dev/null | grep -q -- '--dangerously-bypass-hook-trust'; then
+    smoke_cmd+=(--dangerously-bypass-hook-trust --sandbox read-only)
+  elif "$CODEX_BIN" exec --help 2>/dev/null | grep -q -- '--dangerously-bypass-approvals-and-sandbox'; then
+    smoke_cmd+=(--dangerously-bypass-approvals-and-sandbox)
+  else
+    smoke_cmd+=(--sandbox read-only)
+  fi
+  if CODEX_HOME="$CODEX_HOME" "${smoke_cmd[@]}" "只输出 marketplace-zxgc smoke ok"; then
     return 0
   fi
   if [ "$SMOKE_TEST" = "auto" ]; then
@@ -217,8 +247,12 @@ if [ "$MODE" = "dry-run" ]; then
   echo
   echo "==> dry-run marketplace registration"
   echo "Would run: $CODEX_BIN plugin marketplace add $REPO_ROOT"
-  echo "Would run: $CODEX_BIN plugin remove marketplace-zxgc@marketplace-zxgc"
-  echo "Would run: $CODEX_BIN plugin add marketplace-zxgc@marketplace-zxgc"
+  if supports_installed_plugin_commands; then
+    echo "Would run: $CODEX_BIN plugin remove marketplace-zxgc@marketplace-zxgc"
+    echo "Would run: $CODEX_BIN plugin add marketplace-zxgc@marketplace-zxgc"
+  else
+    echo "Would run: $CODEX_BIN plugin marketplace upgrade marketplace-zxgc"
+  fi
   CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/sync-skills.sh" --dry-run
   run_step "$PLUGIN_ROOT/scripts/install-agents-md.sh" --mode "$RESOLVED_AGENTS_MODE" --target "$CODEX_HOME/AGENTS.md"
   CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/install-rules.sh" --dry-run
@@ -228,9 +262,7 @@ if [ "$MODE" = "dry-run" ]; then
   exit 0
 fi
 
-run_step "$CODEX_BIN" plugin marketplace add "$REPO_ROOT"
-"$CODEX_BIN" plugin remove marketplace-zxgc@marketplace-zxgc >/dev/null 2>&1 || true
-run_step "$CODEX_BIN" plugin add marketplace-zxgc@marketplace-zxgc
+refresh_marketplace_registration
 CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/sync-skills.sh" --apply
 run_step "$PLUGIN_ROOT/scripts/install-agents-md.sh" --mode "$RESOLVED_AGENTS_MODE" --target "$CODEX_HOME/AGENTS.md" --yes
 CODEX_HOME="$CODEX_HOME" run_step "$PLUGIN_ROOT/scripts/install-rules.sh" --apply

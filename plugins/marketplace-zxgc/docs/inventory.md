@@ -26,7 +26,7 @@
 - `hooks/task2zxgc_posthook.py`
 - `hooks/learning_review.py`
 - `hooks.json.template`: portable Codex hook configuration template using `{{PLUGIN_ROOT}}`.
-- `hooks.json`: repository example/template copy; install with `scripts/install-hooks.sh` so machine-specific paths are rendered at install time.
+- `hooks.json`: intentionally empty plugin-level hook manifest. Install real hooks with `scripts/install-hooks.sh` so machine-specific paths are rendered into `CODEX_HOME/hooks.json`.
 
 ### Scripts
 
