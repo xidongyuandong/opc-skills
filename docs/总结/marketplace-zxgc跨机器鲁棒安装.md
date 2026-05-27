@@ -64,6 +64,23 @@ git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLA
 - `$CODEX_HOME/skills` 下没有 `bak`、`backup`、`moved`、`deprecated`、`auto-merge-request` 这类废弃 active skill。
 - Codex smoke test 能输出 `marketplace-zxgc smoke ok`。
 
+## 新增 skill 与默认同步治理
+
+新增 marketplace skill 只表示能力已打包，不等于应该默认安装或自动激活。后续新增 `skills/<name>/SKILL.md` 后，允许先通过 `validate-pack.sh` 校验并按需用 `ZXGC_SKILLS=<name> scripts/sync-skills.sh` 安装；但把新 skill 写入 `sync-skills.sh` 的 `DEFAULT_SKILLS`、或让它进入 c250/本机默认 active skills 清单，必须有用户对该默认同步变更的明确确认。
+
+这个边界用于避免低频、高影响能力被默认注入普通会话。`twin-agent-zyy`、`continuous-agent-loop`、`enterprise-agent-ops` 这类能力可以作为 marketplace 包存在，但默认启用要单独评估其触发频率、上下文成本、误触发风险和人工确认要求。
+
+## c250 Codex 配置同步
+
+c250 上 Codex home 为 `/data/jenkins/.codex/home`，同步配置时不能只依赖最终 `chmod`。如果 `docker cp` 或远端复制过程先落地一个权限过窄的 `config.toml`，Codex TUI 的 skills refresh 可能在修正权限前读取文件并报 `Permission denied`。
+
+稳妥做法是把 `config.toml`、`AGENTS.md` 等配置先写到同目录临时文件，对临时文件完成 `chown` 和 `chmod` 后再用 `mv -f` 原子替换目标文件。同步后至少验证：
+
+- `config.toml` 权限为 `644`，归属目标运行用户。
+- `auth.json` 权限为 `600`，归属目标运行用户。
+- `AGENTS.md` 权限为 `644`。
+- `CODEX_HOME=/data/jenkins/.codex/home codex debug prompt-input "skills refresh smoke"` 能列出预期 skills。
+
 ## 边界和风险
 
 - 总控脚本默认 `--agents-mode block`，避免直接覆盖已有 `AGENTS.md`。干净机器需要全量替换时再使用 `--agents-mode replace`。
