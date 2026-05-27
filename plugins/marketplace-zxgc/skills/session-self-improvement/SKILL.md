@@ -11,6 +11,8 @@ Run a deliberate self-improvement pass over the whole available session, or eval
 
 This is the authoritative self-improvement entrypoint. The older `self-improving-agent` skill is retained only as a compatibility alias; reusable concepts from it now live here as reference material.
 
+When a self-improvement run has evidence relevant to the user's personal twin-agent direction, run the twin-agent relevance gate below and persist a short overall twin-agent summary when the gate passes. If the user explicitly mentions `分身智能体`, `agent-twin`, `twin-agent`, `Persona Evolution`, `OKR`, or `IR/SR/AR`, the gate is automatically in scope. Keep this as a self-improvement sidecar only; do not change ordinary task execution paths.
+
 This skill coordinates existing capabilities:
 
 - `continuous-learning-v2`: express lessons as atomic instincts or reviewable learning candidates.
@@ -35,12 +37,14 @@ This skill coordinates existing capabilities:
    - Project rules: constraints specific to a repo or workflow.
    - Skill gaps: missing trigger rules, missing guardrails, or repeated manual patterns.
    - Proposed idea or information dimension: the user may ask whether some new rule, fact, framework, preference, or workflow should affect future behavior.
+   - Twin-agent candidates: whether the session shows reusable evidence about reducing the user's work pressure through task framing, context recovery, evidence collection, review, evaluation, delivery, or reusable knowledge routing.
 
 3. Evaluate necessity and side effects before classifying.
    - Use `contradiction-analysis` for non-trivial candidates. List the competing forces, identify the principal contradiction, decide whether it is global or local, and select a response.
    - Use `criticism-self-criticism` to review the proposed update before writing it. Ask what could go wrong, what evidence is missing, what maintenance burden it creates, and whether it duplicates existing rules.
    - Compare expected value against negative impact: better future behavior, fewer repeated errors, clearer routing, and safer defaults versus context bloat, stale rules, overfitting, conflicts, privacy risk, and extra maintenance.
    - For non-trivial learning updates, use the memory model in `references/self-improvement-memory-model.md` to separate semantic patterns, episodic evidence, and working-session context.
+   - For twin-agent candidates, read `~/.codex/twin-agent-zyy/skills/persona-evolution-card.md` when available. If unavailable, use `references/persona-evolution-card.md` when present. Apply the no-regression guard before writing any twin-agent artifact.
    - Skip or defer updates when the value is speculative, the evidence is weak, the scope is unclear, or the negative side effects exceed the benefit.
 
 4. Classify each candidate only after the necessity gate.
@@ -49,6 +53,7 @@ This skill coordinates existing capabilities:
    - `rules`: user-level or tool-specific rule files when the lesson is stable but belongs outside `AGENTS.md`.
    - `MCP memory`: durable structured facts, decisions, patterns, bugs, and preferences.
    - `Obsidian knowledge base`: human-readable linked notes, session retrospectives, daily logs, and vault-managed knowledge.
+   - `twin-agent summary`: reviewable persona-evolution or overall twin-agent learning under `~/.codex/twin-agent-zyy/`, never raw session logs.
    - `existing skill`: a specific skill needs clearer trigger rules, workflow, or safety checks.
    - `new skill`: a repeated workflow deserves a dedicated skill.
    - `no action`: too transient, speculative, secret-bearing, or insufficiently evidenced.
@@ -57,6 +62,7 @@ This skill coordinates existing capabilities:
    - Write memories with `agentMemory` MCP tools when available.
    - Use Obsidian skills when the user wants a human-readable knowledge base, linked notes, or vault content.
    - For continuous-learning-v2, prefer reviewable candidates or atomic instincts over broad prose.
+   - For twin-agent summaries, write narrow reviewable artifacts under `~/.codex/twin-agent-zyy/`, usually `evals/` for session evidence and `profile/` only for stable profile material. Include OKR, IR/SR/AR, reusable capability, user pressure reduced, evidence, persistence target, not persisted, risk, verification, rollback, decision, next trigger, and no-regression guard. Update `~/.codex/twin-agent-zyy/README.md` or an index when a new eval artifact is written so the summary is discoverable. High-weight targets such as `AGENTS.md`, hooks, skills, rules, and memory remain proposals unless the user explicitly confirms that exact write.
    - Edit existing skills only when the gap is clearly tied to that skill.
    - Create a new skill only when no existing skill owns the workflow.
    - Update `AGENTS.md` only for stable, global constraints, not one-off task logs.
@@ -67,7 +73,42 @@ This skill coordinates existing capabilities:
 6. Validate.
    - Validate JSON/YAML or skill structure after edits.
    - Run `quick_validate.py` for created or substantially modified skills.
+   - For twin-agent artifacts, verify that they contain the required summary dimensions, are indexed from `~/.codex/twin-agent-zyy/README.md` or an eval index, and contain no raw chat logs, raw session JSONL, tokens, credentials, cookies, private keys, raw auth material, or unredacted sensitive payloads. Confirm they do not add default context to unrelated sessions or change ordinary task execution paths.
    - Report what changed, what was intentionally not persisted, and any blocked writes.
+
+## Twin-Agent Relevance Gate
+
+Run this gate during every `$session-self-improvement` before closing the task:
+
+| Question | Pass condition |
+| --- | --- |
+| Trigger | The user explicitly mentioned `分身智能体`, `agent-twin`, `twin-agent`, `Persona Evolution`, `OKR`, or `IR/SR/AR`; or the session produced clear evidence about reducing the user's work pressure through repeatable agent assistance. |
+| OKR fit | The lesson maps to at least one twin-agent OKR in `~/.codex/twin-agent-zyy/profile/okr-profile.md`: RD -> PD conversion, vertical coding-agent capability, or learning/delivery team enablement. |
+| Artifact value | A future persona/twin-agent review would use this summary to understand, evaluate, or improve the user's personal agent workflow. |
+| Safety | The artifact can be written without raw logs, secrets, credentials, raw auth files, or broad always-on instructions. |
+| No-regression | The artifact does not alter ordinary Codex task execution, and any high-weight target remains a proposal unless explicitly confirmed. |
+
+If the gate passes, write or update a concise twin-agent summary under `~/.codex/twin-agent-zyy/evals/` and add a link to `~/.codex/twin-agent-zyy/README.md` or an eval index. If it fails, state `No twin-agent summary written` and why in the final report.
+
+## Twin-Agent Summary Dimensions
+
+Every persisted twin-agent summary must cover these dimensions:
+
+- `Theme`: the technical or workflow theme of the session.
+- `OKR`: which twin-agent OKR the evidence supports.
+- `IR`: why this matters and what impact it should create.
+- `SR`: what strategy, workflow, tool boundary, or no-regression guard applies.
+- `AR`: what artifact, command, evaluation, file, proposal, or no-action decision closes the loop.
+- `Reusable capability`: the repeatable capability future twin-agent runs can reuse.
+- `User pressure reduced`: which burden was reduced for the user, such as context recovery, evidence collection, decision framing, execution, verification, MR/issue delivery, or knowledge routing.
+- `Evidence`: concrete files, commands, MR/issue links, verification results, or user corrections; no raw logs.
+- `Persistence target`: where the lesson was stored and why.
+- `Not persisted`: what was intentionally excluded and why.
+- `Risk`: possible overfitting, context bloat, privacy risk, or execution-path side effect.
+- `Verification`: checks proving the artifact is useful and safe.
+- `Rollback`: how to remove, supersede, or downgrade the artifact.
+- `Next trigger`: exact phrase or scenario that should reuse this summary.
+- `No-regression guard`: explicitly state whether it changes ordinary task execution, adds default context to unrelated sessions, touches high-weight targets, depends on raw logs/sensitive data, and has verification/rollback.
 
 ## Necessity Gate
 
