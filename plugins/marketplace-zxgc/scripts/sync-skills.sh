@@ -17,7 +17,7 @@ TARGET_ROOT="$CODEX_HOME/skills"
 BACKUP_ROOT="$CODEX_HOME/backups/skills"
 STAMP="$(date +%Y%m%d%H%M%S)"
 
-DEFAULT_SKILLS="marketplace-zxgc session-self-improvement twin-agent-zyy continuous-agent-loop self-improving-agent continuous-learning-v2 code-refactor codex-hooks codex-hook codex-remote-container codex-ssh-remote-config algorithm-engineer-workflow algorithm-data-diagnosis algorithm-tensorboard-analysis algorithm-training-debug algorithm-training-review algorithm-rl-debug algorithm-eval-diagnosis algorithm-eval-closure algorithm-agent-trace-analysis"
+DEFAULT_SKILLS="marketplace-zxgc session-self-improvement twin-agent-zyy continuous-agent-loop enterprise-agent-ops self-improving-agent continuous-learning-v2 code-refactor codex-hooks codex-hook codex-remote-container codex-ssh-remote-config algorithm-engineer-workflow algorithm-data-diagnosis algorithm-tensorboard-analysis algorithm-training-debug algorithm-training-review algorithm-rl-debug algorithm-eval-diagnosis algorithm-eval-closure algorithm-agent-trace-analysis"
 SKILLS="${ZXGC_SKILLS:-$DEFAULT_SKILLS}"
 LINK_SKILLS="${ZXGC_LINK_SKILLS:-}"
 REMOVED_SKILLS="${ZXGC_REMOVED_SKILLS:-auto-merge-request.moved-to-code-refactor.20260521}"

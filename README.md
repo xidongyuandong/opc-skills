@@ -109,6 +109,7 @@ The initial pack includes:
 - `session-self-improvement`
 - `twin-agent-zyy`
 - `continuous-agent-loop`
+- `enterprise-agent-ops`
 - `self-improving-agent`
 - `continuous-learning-v2`
 - `codex-hooks`

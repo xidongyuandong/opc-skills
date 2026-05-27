@@ -8,6 +8,7 @@
 - `session-self-improvement`: session retrospective and persistence targeting.
 - `twin-agent-zyy`: Zheng Yuyu twin-agent evolution summaries, task-evolution templates, OKR/IR/SR/AR routing, and no-regression boundaries.
 - `continuous-agent-loop`: long-running and continuous agent task loops with quality gates, checkpoints, and recovery controls.
+- `enterprise-agent-ops`: long-lived/service-like agent runner operations with observability, safety controls, rollout, rollback, and incident response.
 - `self-improving-agent`: semantic/episodic self-improvement workflow.
 - `continuous-learning-v2`: learning candidate pipeline.
 - `code-refactor`: automated helper commands for autocommit, autofix, autosummary, autodoc, autointerpret, and auto-merge-request workflows.
