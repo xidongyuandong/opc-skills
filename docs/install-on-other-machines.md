@@ -138,7 +138,7 @@ CODEX_HOME="$CODEX_HOME" "$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/script
 默认会同步这些 skills：
 
 ```text
-marketplace-zxgc session-self-improvement twin-agent-zyy self-improving-agent continuous-learning-v2 code-refactor codex-hooks codex-hook codex-remote-container codex-ssh-remote-config algorithm-engineer-workflow algorithm-data-diagnosis algorithm-tensorboard-analysis algorithm-training-debug algorithm-training-review algorithm-rl-debug algorithm-eval-diagnosis algorithm-eval-closure algorithm-agent-trace-analysis
+marketplace-zxgc session-self-improvement twin-agent-zyy continuous-agent-loop self-improving-agent continuous-learning-v2 code-refactor codex-hooks codex-hook codex-remote-container codex-ssh-remote-config algorithm-engineer-workflow algorithm-data-diagnosis algorithm-tensorboard-analysis algorithm-training-debug algorithm-training-review algorithm-rl-debug algorithm-eval-diagnosis algorithm-eval-closure algorithm-agent-trace-analysis
 ```
 
 如只想同步一部分：
