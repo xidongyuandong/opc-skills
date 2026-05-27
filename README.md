@@ -107,6 +107,7 @@ The initial pack includes:
 
 - `marketplace-zxgc`
 - `session-self-improvement`
+- `twin-agent-zyy`
 - `self-improving-agent`
 - `continuous-learning-v2`
 - `codex-hooks`

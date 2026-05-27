@@ -11,7 +11,7 @@ Run a deliberate self-improvement pass over the whole available session, or eval
 
 This is the authoritative self-improvement entrypoint. The older `self-improving-agent` skill is retained only as a compatibility alias; reusable concepts from it now live here as reference material.
 
-When a self-improvement run has evidence relevant to the user's personal twin-agent direction, run the twin-agent relevance gate below and persist a short overall twin-agent summary when the gate passes. If the user explicitly mentions `分身智能体`, `agent-twin`, `twin-agent`, `Persona Evolution`, `OKR`, or `IR/SR/AR`, the gate is automatically in scope. Keep this as a self-improvement sidecar only; do not change ordinary task execution paths.
+When a self-improvement run has evidence relevant to the user's personal twin-agent direction, use the `twin-agent-zyy` skill as the authoritative sidecar. If the user explicitly mentions `分身智能体`, `agent-twin`, `twin-agent`, `Persona Evolution`, `OKR`, or `IR/SR/AR`, the sidecar is automatically in scope. Keep this as a self-improvement sidecar only; do not change ordinary task execution paths.
 
 This skill coordinates existing capabilities:
 
@@ -21,6 +21,7 @@ This skill coordinates existing capabilities:
 - `contradiction-analysis`: identify competing forces, the principal contradiction, and what kind of update would resolve it.
 - `criticism-self-criticism`: review the proposed update for evidence quality, overreach, maintenance burden, and unintended harm.
 - `codex-hooks`: use only when the improvement is specifically about Codex hook configuration.
+- `twin-agent-zyy`: use when the run should summarize how the agent learns the user's working style, including why the task exists, how it was defined, why that definition was chosen, how it was executed, how blockers were solved, and which tools/context were used.
 
 ## Workflow
 
@@ -44,7 +45,7 @@ This skill coordinates existing capabilities:
    - Use `criticism-self-criticism` to review the proposed update before writing it. Ask what could go wrong, what evidence is missing, what maintenance burden it creates, and whether it duplicates existing rules.
    - Compare expected value against negative impact: better future behavior, fewer repeated errors, clearer routing, and safer defaults versus context bloat, stale rules, overfitting, conflicts, privacy risk, and extra maintenance.
    - For non-trivial learning updates, use the memory model in `references/self-improvement-memory-model.md` to separate semantic patterns, episodic evidence, and working-session context.
-   - For twin-agent candidates, read `~/.codex/twin-agent-zyy/skills/persona-evolution-card.md` when available. If unavailable, use `references/persona-evolution-card.md` when present. Apply the no-regression guard before writing any twin-agent artifact.
+   - For twin-agent candidates, load and follow the `twin-agent-zyy` skill. If the skill is unavailable, read `~/.codex/twin-agent-zyy/skills/persona-evolution-card.md` when available. Apply the no-regression guard before writing any twin-agent artifact.
    - Skip or defer updates when the value is speculative, the evidence is weak, the scope is unclear, or the negative side effects exceed the benefit.
 
 4. Classify each candidate only after the necessity gate.
@@ -62,7 +63,7 @@ This skill coordinates existing capabilities:
    - Write memories with `agentMemory` MCP tools when available.
    - Use Obsidian skills when the user wants a human-readable knowledge base, linked notes, or vault content.
    - For continuous-learning-v2, prefer reviewable candidates or atomic instincts over broad prose.
-   - For twin-agent summaries, write narrow reviewable artifacts under `~/.codex/twin-agent-zyy/`, usually `evals/` for session evidence and `profile/` only for stable profile material. Include OKR, IR/SR/AR, reusable capability, user pressure reduced, evidence, persistence target, not persisted, risk, verification, rollback, decision, next trigger, and no-regression guard. Update `~/.codex/twin-agent-zyy/README.md` or an index when a new eval artifact is written so the summary is discoverable. High-weight targets such as `AGENTS.md`, hooks, skills, rules, and memory remain proposals unless the user explicitly confirms that exact write.
+   - For twin-agent summaries, follow `twin-agent-zyy` and write narrow reviewable artifacts under `~/.codex/twin-agent-zyy/`, usually `evals/` for session evidence and `profile/` only for stable profile material. Include the full Task Evolution Summary dimensions plus OKR, IR/SR/AR, reusable capability, user pressure reduced, evidence, persistence target, not persisted, risk, verification, rollback, decision, next trigger, and no-regression guard. Update `~/.codex/twin-agent-zyy/README.md` or an index when a new eval artifact is written so the summary is discoverable. High-weight targets such as `AGENTS.md`, hooks, skills, rules, and memory remain proposals unless the user explicitly confirms that exact write.
    - Edit existing skills only when the gap is clearly tied to that skill.
    - Create a new skill only when no existing skill owns the workflow.
    - Update `AGENTS.md` only for stable, global constraints, not one-off task logs.
