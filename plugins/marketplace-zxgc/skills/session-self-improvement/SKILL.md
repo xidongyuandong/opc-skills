@@ -21,7 +21,7 @@ This skill coordinates existing capabilities:
 - `contradiction-analysis`: identify competing forces, the principal contradiction, and what kind of update would resolve it.
 - `criticism-self-criticism`: review the proposed update for evidence quality, overreach, maintenance burden, and unintended harm.
 - `codex-hooks`: use only when the improvement is specifically about Codex hook configuration.
-- `twin-agent-zyy`: use when the run should summarize how the agent learns the user's working style, including why the task exists, how it was defined, why that definition was chosen, how it was executed, how blockers were solved, and which tools/context were used.
+- `twin-agent-zyy`: use when the run should summarize how the agent learns the user's working style, including why the task exists, how it aligns to OKR/IR/SR/AR, what target benefit it creates, whether higher-priority work exists, how it was defined, why that definition was chosen, how it was executed, how blockers were solved, and which tools/context were used.
 
 ## Workflow
 
@@ -63,7 +63,7 @@ This skill coordinates existing capabilities:
    - Write memories with `agentMemory` MCP tools when available.
    - Use Obsidian skills when the user wants a human-readable knowledge base, linked notes, or vault content.
    - For continuous-learning-v2, prefer reviewable candidates or atomic instincts over broad prose.
-   - For twin-agent summaries, follow `twin-agent-zyy` and write narrow reviewable artifacts under `~/.codex/twin-agent-zyy/`, usually `evals/` for session evidence and `profile/` only for stable profile material. Include the full Task Evolution Summary dimensions plus OKR, IR/SR/AR, reusable capability, user pressure reduced, evidence, persistence target, not persisted, risk, verification, rollback, decision, next trigger, and no-regression guard. Update `~/.codex/twin-agent-zyy/README.md` or an index when a new eval artifact is written so the summary is discoverable. High-weight targets such as `AGENTS.md`, hooks, skills, rules, and memory remain proposals unless the user explicitly confirms that exact write.
+   - For twin-agent summaries, follow `twin-agent-zyy` and write narrow reviewable artifacts under `~/.codex/twin-agent-zyy/`, usually `evals/` for session evidence and `profile/` only for stable profile material. Include the full Task Evolution Summary dimensions plus OKR, IR/SR/AR alignment, target contribution after solving, higher-priority alternative, reusable capability, user pressure reduced, evidence, persistence target, not persisted, risk, verification, rollback, decision, next trigger, and no-regression guard. Update `~/.codex/twin-agent-zyy/README.md` or an index when a new eval artifact is written so the summary is discoverable. High-weight targets such as `AGENTS.md`, hooks, skills, rules, and memory remain proposals unless the user explicitly confirms that exact write.
    - Edit existing skills only when the gap is clearly tied to that skill.
    - Create a new skill only when no existing skill owns the workflow.
    - Update `AGENTS.md` only for stable, global constraints, not one-off task logs.
@@ -100,6 +100,7 @@ Every persisted twin-agent summary must cover these dimensions:
 - `IR`: why this matters and what impact it should create.
 - `SR`: what strategy, workflow, tool boundary, or no-regression guard applies.
 - `AR`: what artifact, command, evaluation, file, proposal, or no-action decision closes the loop.
+- `Goal alignment`: whether the task is OKR-level, IR-level, SR-level, or AR-level; how solving it helps the target; and whether there is higher-priority work.
 - `Reusable capability`: the repeatable capability future twin-agent runs can reuse.
 - `User pressure reduced`: which burden was reduced for the user, such as context recovery, evidence collection, decision framing, execution, verification, MR/issue delivery, or knowledge routing.
 - `Evidence`: concrete files, commands, MR/issue links, verification results, or user corrections; no raw logs.

@@ -5,6 +5,9 @@
 - User intent:
 - Business / engineering relevance:
 - Why now:
+- OKR / IR / SR / AR alignment:
+- Target contribution after solving:
+- Higher-priority alternative:
 
 ## 2. Task Definition
 - Original request:
@@ -16,6 +19,7 @@
 ## 3. Why This Definition
 - Reasoning:
 - Alternatives considered:
+- Priority reasoning:
 - User working-style alignment:
 - Risk control:
 - Human confirmation points:

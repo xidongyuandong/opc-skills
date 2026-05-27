@@ -39,6 +39,7 @@ Before writing a twin-agent artifact, check:
 | --- | --- |
 | Trigger | Explicit twin-agent wording is present, or the session shows clear repeatable work-pressure reduction. |
 | OKR fit | The lesson maps to `O1 RD->PD`, `O2 vertical coding-agent capability`, or `O3 learning delivery` in `~/.codex/twin-agent-zyy/profile/okr-profile.md`. |
+| Goal alignment | The artifact can explain which OKR / IR / SR / AR dimension the task belongs to, how solving it helps that goal, and whether a higher-priority task should have been preferred. |
 | Artifact value | A future twin-agent review could use the summary to understand, evaluate, or improve the user's personal agent workflow. |
 | Safety | The artifact can be written without raw logs, secrets, credentials, raw auth files, or broad always-on instructions. |
 | No-regression | The artifact does not alter ordinary Codex task execution; high-weight targets remain proposals unless explicitly confirmed. |
@@ -57,6 +58,9 @@ Every persisted twin-agent task summary must answer the user's working-style que
 - User intent:
 - Business / engineering relevance:
 - Why now:
+- OKR / IR / SR / AR alignment:
+- Target contribution after solving:
+- Higher-priority alternative:
 
 ## 2. Task Definition
 - Original request:
@@ -68,6 +72,7 @@ Every persisted twin-agent task summary must answer the user's working-style que
 ## 3. Why This Definition
 - Reasoning:
 - Alternatives considered:
+- Priority reasoning:
 - User working-style alignment:
 - Risk control:
 - Human confirmation points:
@@ -139,6 +144,7 @@ Each persisted artifact must contain:
 - `IR`: why this matters and what impact it should create.
 - `SR`: strategy, workflow, tool boundary, persistence route, or no-regression guard.
 - `AR`: artifact, command, evaluation, file, proposal, or no-action decision that closes the loop.
+- `Goal alignment`: whether the task is primarily OKR-level, IR-level, SR-level, or AR-level work; which objective it supports; what contribution the solved task makes; and whether a higher-priority task exists.
 - `Reusable capability`: repeatable capability future agents can reuse.
 - `User pressure reduced`: burden reduced for the user, such as context recovery, evidence collection, decision framing, execution, verification, MR/issue delivery, or knowledge routing.
 - `Evidence`: concrete files, commands, MR/issue links, verification results, or user corrections; no raw logs.
@@ -153,7 +159,7 @@ Each persisted artifact must contain:
 ## Workflow
 
 1. Reconstruct task evidence from visible conversation, compacted summaries, changed files, validation output, and relevant local artifacts.
-2. Apply the relevance gate and OKR mapping.
+2. Apply the relevance gate, OKR mapping, and goal-priority analysis. State whether the task is mainly OKR alignment, IR definition, SR strategy/system design, or AR execution/artifact delivery.
 3. Write or update one concise artifact under `~/.codex/twin-agent-zyy/evals/`.
 4. Update `~/.codex/twin-agent-zyy/README.md` or an eval index with a one-line discoverable link and reusable capability.
 5. Keep project-specific implementation knowledge in the repo's `docs/总结`; keep compact machine-readable lessons in MCP/agent memory only when useful.
@@ -179,6 +185,8 @@ required = [
     "Why This Task", "Task Definition", "Why This Definition",
     "Execution Path", "Problems And Resolution", "Tools And Context Used",
     "User Work Style Learned", "Agent Capability Learned",
+    "OKR / IR / SR / AR alignment", "Target contribution after solving",
+    "Higher-priority alternative", "Priority reasoning",
     "Reusable capability", "User pressure reduced", "Next trigger",
 ]
 missing = [x for x in required if x not in text]
