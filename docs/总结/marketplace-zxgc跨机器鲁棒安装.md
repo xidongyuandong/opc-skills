@@ -9,7 +9,7 @@
 ## 证据
 
 - c250/container250 的 `CODEX_HOME` 是 `/data/jenkins/.codex/home`，不是默认 `$HOME/.codex`。如果安装脚本没有显式使用 `CODEX_HOME`，skills、rules、hooks 会落到错误目录。
-- local marketplace 拉取新代码后，`codex plugin marketplace upgrade` 不一定刷新 installed plugin cache。实测更稳妥的流程是 `plugin remove marketplace-zxgc@marketplace-zxgc` 后再 `plugin add marketplace-zxgc@marketplace-zxgc`。
+- local marketplace 拉取新代码后，刷新方式依赖 Codex CLI 版本。旧 CLI 可能支持 `codex plugin add/list`，可用 `plugin remove marketplace-zxgc@marketplace-zxgc` 后再 `plugin add marketplace-zxgc@marketplace-zxgc`；当前本机 CLI 只支持 `codex plugin marketplace add/upgrade/remove`，且本地目录 marketplace 不是 Git marketplace，`marketplace upgrade` 会提示不可用。总控脚本应兼容检测：先 `plugin marketplace add <repo>`，旧 CLI 走 installed plugin remove/add，新 CLI 对本地 marketplace 允许 upgrade 失败后继续同步 assets。
 - hooks 不能跨机器复制，因为 `hooks.json` 内需要目标机器真实的 plugin 脚本路径。必须在目标机器用模板重新渲染。
 - c250 active skills 曾残留 `auto-merge-request.moved-to-code-refactor.20260521`，会被 Codex 扫描成可用 skill。同步脚本需要把已知废弃 skill stub 移到备份目录。
 - 仅检查文件存在不够，需要 Codex smoke test 验证 hook 信任/启动路径不会阻断下一次会话。
@@ -56,7 +56,7 @@ git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLA
 ## 验证清单
 
 - `validate-pack.sh` 通过。
-- `codex plugin list` 显示 `marketplace-zxgc@marketplace-zxgc (installed, enabled)`。
+- 若 CLI 支持 `codex plugin list`，确认显示 `marketplace-zxgc@marketplace-zxgc (installed, enabled)`；若当前 CLI 没有 `plugin list`，用 `codex plugin marketplace add "$MARKETPLACE_ZXGC_HOME"` 加文件验证作为替代。
 - `$CODEX_HOME/AGENTS.md` 存在。
 - `$CODEX_HOME/hooks.json` 存在且路径指向目标机器的 `MARKETPLACE_ZXGC_HOME`。
 - `$CODEX_HOME/rules/default.rules` 存在。
@@ -67,7 +67,7 @@ git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLA
 ## 边界和风险
 
 - 总控脚本默认 `--agents-mode block`，避免直接覆盖已有 `AGENTS.md`。干净机器需要全量替换时再使用 `--agents-mode replace`。
-- smoke test 使用 `--dangerously-bypass-hook-trust` 仅用于受控安装验证，不应作为日常 Codex 启动方式。
+- smoke test 参数也依赖 Codex CLI 版本。旧 CLI 可用 `--dangerously-bypass-hook-trust --sandbox read-only`；当前 CLI 使用 `--dangerously-bypass-approvals-and-sandbox`。安装脚本应通过 `codex exec --help` 检测可用参数，不要硬编码单一版本。
 - 安装流程不保存 GitLab token、Codex auth、cookie、私钥或任何机器登录态。
 - 目标机器缺少 `jq` 时应先安装依赖，不应跳过 hooks/JSON 校验。
 
