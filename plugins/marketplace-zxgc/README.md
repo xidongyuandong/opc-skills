@@ -13,6 +13,28 @@ This marketplace packages selected user-level Codex assets:
 
 It intentionally excludes authentication files, tokens, cookies, private keys, and raw credential output.
 
+## Optional MCP: agentMemory
+
+`agent-memory-mcp` is packaged with its Codex-adapted MCP server source under `tools/agentMemory`. It is not part of default skill sync because enabling MCP modifies the target `config.toml` and should be explicit per machine.
+
+Install on a target machine:
+
+```bash
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}" \
+AGENT_MEMORY_PROJECT_ID="${AGENT_MEMORY_PROJECT_ID:-$(whoami)-agent-memory}" \
+AGENT_MEMORY_WORKSPACE="${AGENT_MEMORY_WORKSPACE:-$HOME}" \
+"$MARKETPLACE_ZXGC_HOME/plugins/marketplace-zxgc/scripts/install-agent-memory-mcp.sh" --apply
+```
+
+c250:
+
+```bash
+CODEX_HOME=/data/jenkins/.codex/home \
+AGENT_MEMORY_PROJECT_ID=c250-jenkins-home \
+AGENT_MEMORY_WORKSPACE=/data/jenkins \
+/data/jenkins/marketplace-zxgc/plugins/marketplace-zxgc/scripts/install-agent-memory-mcp.sh --apply
+```
+
 ## Install On Other Machines
 
 For the full cross-machine installation and usage guide, see the repository-level `docs/install-on-other-machines.md`.
@@ -53,6 +75,14 @@ Apply:
 
 `code-refactor` is included in the default sync set with its `commands/` references so each subcommand can load the required procedure file.
 
+The self-improvement skill set is included in the default sync set:
+
+- `session-self-improvement`
+- `session-self-improvement-eval`
+- `twin-agent-zyy`
+
+These skills use `$CODEX_HOME` for durable twin-agent artifacts and fall back to bundled `twin-agent-zyy/references/` files when `$CODEX_HOME/twin-agent-zyy/` has not been created on a target machine.
+
 The algorithm engineering skill set is included in the default sync set:
 
 - `algorithm-engineer-workflow`
@@ -66,6 +96,8 @@ The algorithm engineering skill set is included in the default sync set:
 - `algorithm-agent-trace-analysis`
 
 `task2zxgc` is intentionally excluded from the default sync set so the marketplace copy remains the only maintained copy.
+
+`agent-memory-mcp` is also excluded from the default sync set. Use `install-agent-memory-mcp.sh` so the skill, MCP server source, dependencies, and target-local `config.toml` block are installed together.
 
 ## Application: task2zxgc
 

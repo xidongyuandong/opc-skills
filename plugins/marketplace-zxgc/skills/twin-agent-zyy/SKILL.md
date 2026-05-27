@@ -13,11 +13,13 @@ The goal is not ordinary task logging. The goal is to learn how the user defines
 
 ## Storage
 
-- Durable local store: `~/.codex/twin-agent-zyy/`
-- Session/eval artifacts: `~/.codex/twin-agent-zyy/evals/`
-- Stable profile material: `~/.codex/twin-agent-zyy/profile/`
-- Canonical reference copy: `~/.codex/twin-agent-zyy/skills/persona-evolution-card.md`
-- Discovery index: `~/.codex/twin-agent-zyy/README.md`
+- Resolve `CODEX_HOME` from the environment; if unset, use `~/.codex`.
+- Durable local store: `$CODEX_HOME/twin-agent-zyy/`
+- Session/eval artifacts: `$CODEX_HOME/twin-agent-zyy/evals/`
+- Stable profile material: `$CODEX_HOME/twin-agent-zyy/profile/`
+- Canonical reference copy: `$CODEX_HOME/twin-agent-zyy/skills/persona-evolution-card.md`
+- Discovery index: `$CODEX_HOME/twin-agent-zyy/README.md`
+- If the durable store is absent on a newly installed machine, use this skill's bundled `references/okr-profile.md` and `references/persona-evolution-card.md` as read-only fallbacks, then create `$CODEX_HOME/twin-agent-zyy/` only when a twin-agent artifact is actually persisted.
 
 Do not store raw session JSONL, raw chat logs, tokens, cookies, private keys, API keys, raw auth files, or unredacted sensitive payloads.
 
@@ -38,7 +40,7 @@ Before writing a twin-agent artifact, check:
 | Question | Pass condition |
 | --- | --- |
 | Trigger | Explicit twin-agent wording is present, or the session shows clear repeatable work-pressure reduction. |
-| OKR fit | The lesson maps to `O1 RD->PD`, `O2 vertical coding-agent capability`, or `O3 learning delivery` in `~/.codex/twin-agent-zyy/profile/okr-profile.md`. |
+| OKR fit | The lesson maps to `O1 RD->PD`, `O2 vertical coding-agent capability`, or `O3 learning delivery` in `$CODEX_HOME/twin-agent-zyy/profile/okr-profile.md`, or to bundled `references/okr-profile.md` when the durable store has not been created yet. |
 | Goal alignment | The artifact can explain which OKR / IR / SR / AR dimension the task belongs to, how solving it helps that goal, and whether a higher-priority task should have been preferred. |
 | Artifact value | A future twin-agent review could use the summary to understand, evaluate, or improve the user's personal agent workflow. |
 | Safety | The artifact can be written without raw logs, secrets, credentials, raw auth files, or broad always-on instructions. |
@@ -69,7 +71,17 @@ Every persisted twin-agent task summary must answer the user's working-style que
 - Non-scope:
 - Completion criteria:
 
-## 3. Why This Definition
+## 3. Demand Evolution
+- User input / demand event:
+- Demand represented:
+- Why this demand emerged:
+- Resolution strategy:
+- Relationship to previous demands:
+- Short-term goal alignment:
+- Mid-term goal alignment:
+- Long-term goal alignment:
+
+## 4. Why This Definition
 - Reasoning:
 - Alternatives considered:
 - Priority reasoning:
@@ -77,35 +89,35 @@ Every persisted twin-agent task summary must answer the user's working-style que
 - Risk control:
 - Human confirmation points:
 
-## 4. Execution Path
+## 5. Execution Path
 - Investigation:
 - Plan:
 - Implementation:
 - Verification:
 - Delivery:
 
-## 5. Problems And Resolution
+## 6. Problems And Resolution
 - Problems encountered:
 - Diagnosis:
 - Root cause:
 - Fix:
 - Remaining risk:
 
-## 6. Tools And Context Used
+## 7. Tools And Context Used
 - Skills:
 - MCP / plugins:
 - Scripts / CLI:
 - Docs / logs / configs:
 - Key evidence:
 
-## 7. User Work Style Learned
+## 8. User Work Style Learned
 - Decision pattern:
 - Quality bar:
 - Preferred workflow:
 - Safety boundary:
 - Delivery expectation:
 
-## 8. Agent Capability Learned
+## 9. Agent Capability Learned
 - Reusable capability:
 - User pressure reduced:
 - Persistence target:
@@ -145,6 +157,7 @@ Each persisted artifact must contain:
 - `SR`: strategy, workflow, tool boundary, persistence route, or no-regression guard.
 - `AR`: artifact, command, evaluation, file, proposal, or no-action decision that closes the loop.
 - `Goal alignment`: whether the task is primarily OKR-level, IR-level, SR-level, or AR-level work; which objective it supports; what contribution the solved task makes; and whether a higher-priority task exists.
+- `Demand Evolution`: what the user's consecutive inputs represented, why each demand emerged, how the agent solved or should solve it, how it relates to previous demands, and how it maps to short-, mid-, and long-term goals.
 - `Reusable capability`: repeatable capability future agents can reuse.
 - `User pressure reduced`: burden reduced for the user, such as context recovery, evidence collection, decision framing, execution, verification, MR/issue delivery, or knowledge routing.
 - `Evidence`: concrete files, commands, MR/issue links, verification results, or user corrections; no raw logs.
@@ -160,8 +173,8 @@ Each persisted artifact must contain:
 
 1. Reconstruct task evidence from visible conversation, compacted summaries, changed files, validation output, and relevant local artifacts.
 2. Apply the relevance gate, OKR mapping, and goal-priority analysis. State whether the task is mainly OKR alignment, IR definition, SR strategy/system design, or AR execution/artifact delivery.
-3. Write or update one concise artifact under `~/.codex/twin-agent-zyy/evals/`.
-4. Update `~/.codex/twin-agent-zyy/README.md` or an eval index with a one-line discoverable link and reusable capability.
+3. Write or update one concise artifact under `$CODEX_HOME/twin-agent-zyy/evals/`.
+4. Update `$CODEX_HOME/twin-agent-zyy/README.md` or an eval index with a one-line discoverable link and reusable capability.
 5. Keep project-specific implementation knowledge in the repo's `docs/总结`; keep compact machine-readable lessons in MCP/agent memory only when useful.
 6. Validate required dimensions, index discoverability, and sensitive-content boundaries.
 
@@ -179,12 +192,17 @@ After writing an artifact:
 ```bash
 python3 - <<'PY'
 from pathlib import Path
-p = Path("~/.codex/twin-agent-zyy/evals/<artifact>.md").expanduser()
+import os
+codex_home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")).expanduser()
+p = codex_home / "twin-agent-zyy" / "evals" / "<artifact>.md"
 text = p.read_text()
 required = [
     "Why This Task", "Task Definition", "Why This Definition",
     "Execution Path", "Problems And Resolution", "Tools And Context Used",
     "User Work Style Learned", "Agent Capability Learned",
+    "Demand Evolution", "User input / demand event", "Demand represented",
+    "Why this demand emerged", "Relationship to previous demands",
+    "Short-term goal alignment", "Mid-term goal alignment", "Long-term goal alignment",
     "OKR / IR / SR / AR alignment", "Target contribution after solving",
     "Higher-priority alternative", "Priority reasoning",
     "Reusable capability", "User pressure reduced", "Next trigger",

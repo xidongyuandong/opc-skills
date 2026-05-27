@@ -188,6 +188,9 @@ verify_installation() {
   test -f "$CODEX_HOME/skills/marketplace-zxgc/SKILL.md"
   test -f "$CODEX_HOME/skills/code-refactor/SKILL.md"
   test -f "$CODEX_HOME/skills/session-self-improvement/SKILL.md"
+  test -f "$CODEX_HOME/skills/session-self-improvement-eval/SKILL.md"
+  test -f "$CODEX_HOME/skills/twin-agent-zyy/SKILL.md"
+  test -f "$CODEX_HOME/skills/twin-agent-zyy/references/okr-profile.md"
 
   stale_count="$(
     { find "$CODEX_HOME/skills" -maxdepth 2 -name SKILL.md -print 2>/dev/null |
