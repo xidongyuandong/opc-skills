@@ -53,6 +53,7 @@ Prefer `./scripts/install-marketplace-zxgc.sh --dry-run` and then `--apply` for 
 
 1. Copy or edit assets inside `plugins/marketplace-zxgc/`.
 2. Keep plugin metadata in sync with added capabilities.
+   Adding a new packaged skill or capability does not imply it should be installed by default. Before adding any new skill to `scripts/sync-skills.sh` `DEFAULT_SKILLS`, or otherwise making it active on target machines, get explicit human confirmation for that exact default-sync change.
 3. When editing operation docs, classify each step as automated, parameterized, web-console manual, credential/manual, or destructive/manual before writing labels.
 4. Run `./scripts/validate-pack.sh`.
 5. Install or refresh the marketplace with `scripts/install-marketplace-zxgc.sh`; it performs marketplace registration, plugin-cache compatibility handling, skill/rule/hook sync, and verification.
@@ -61,6 +62,7 @@ Prefer `./scripts/install-marketplace-zxgc.sh --dry-run` and then `--apply` for 
 ## Safety Rules
 
 - Back up before replacing `AGENTS.md`, `hooks.json`, or existing skills.
+- Treat marketplace skill additions in two stages: packaging is allowed after validation, but default synchronization/activation requires explicit human confirmation. Prefer optional `ZXGC_SKILLS=...` instructions for low-frequency or high-impact skills.
 - Keep skill backups outside the active skills directory, such as `$CODEX_HOME/backups/skills/<timestamp>/`, so old skill copies are not rediscovered.
 - Prefer managed templates and explicit scripts over free-form manual instructions.
 - Do not mark a step as `【人工】` when it can be handled through parameters, environment variables, dry-run/apply, GitLab API, or an existing marketplace script.
