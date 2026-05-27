@@ -25,6 +25,21 @@ PLUGIN_SCRIPT = PLUGIN_ROOT / "skills" / "task2zxgc" / "scripts" / "task2zxgc.py
 INSTALLED_SCRIPT = CODEX_HOME / "skills" / "task2zxgc" / "scripts" / "task2zxgc.py"
 
 
+def consume_stdin() -> dict:
+    """Drain Codex hook stdin before any early return to avoid Broken pipe."""
+    try:
+        raw = sys.stdin.read()
+    except Exception:
+        return {}
+    if not raw.strip():
+        return {}
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
 def resolve_task2zxgc_script() -> Path:
     if PLUGIN_SCRIPT.exists():
         return PLUGIN_SCRIPT
@@ -35,6 +50,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--event", default="Stop")
     parser.parse_args()
+    consume_stdin()
 
     if not PENDING_FILE.exists():
         return 0
