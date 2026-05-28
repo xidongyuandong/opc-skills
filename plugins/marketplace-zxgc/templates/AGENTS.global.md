@@ -27,6 +27,7 @@
 ## Local Workflow
 
 - When working from a requirement file named `{需求文件}.md`, write `{需求文件}.plan.md` and `{需求文件}.task.md` next to it by default, unless the user explicitly requests only a specific output file or forbids extra files.
+- Do not append `{需求文件}.task.md` content, execution流水, acceptance summaries, verification details, TODO status, or long final reports back into the original `{需求文件}.md`. If the original requirement file needs a completion note, append only a short pointer such as `任务已完成，详见 {需求文件}.task.md`; keep detailed execution and acceptance content in `{需求文件}.task.md`.
 - In Git/code repositories, check `docs/总结/*.md` as optional context before substantive code changes or repository-wide analysis. Read only summaries relevant to the task, touched modules, feature names, or error keywords.
 - Persist new repository understanding under `<repo-root>/docs/总结/` only when the task explicitly concerns a code/product repository and produces durable repository-wide architecture, module, dependency, build/test, or workflow knowledge.
 - Do not create `docs/总结` for incidental repos, config/cache/tool folders, or one-off task logs unless the user asks. Never store secrets, raw command dumps, transient logs, or unrelated implementation notes there.
