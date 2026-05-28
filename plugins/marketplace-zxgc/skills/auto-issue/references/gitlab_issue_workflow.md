@@ -26,11 +26,14 @@ Before submission, confirm:
 - Before using a configured `GITLAB_URL`, verify it is the API root by calling `/api/v4/projects/<urlencoded-project>` and checking that the response is JSON. Some local env files may store a GitLab URL plus project-path lists; do not append `/api/v4` to that value blindly.
 - For `gitlab.chehejia.com`, prefer the explicit API root `https://gitlab.chehejia.com` when the configured URL is not a plain host root.
 - Git HTTPS credentials from `git credential fill` may authenticate clone/fetch but still fail GitLab REST API calls with `401`; treat that as a non-API credential and look for a real GitLab token from the approved local env source instead.
+- In this environment, the approved fallback token source can be `~/.claude/feishu.env`; load it only at execution time and never print token values.
 - Load GitLab tokens only at execution time, do not print token values, and report only status code, content type, issue IID, and web URL.
 
 ## Existing Issue Handling
 
 For an existing issue URL, prefer commenting with the generated structured content unless the user explicitly asks to overwrite the issue description. Do not close, reopen, assign, delete, or relabel issues without explicit instruction.
+
+Do not reuse an existing issue or MR from previous conversation context, branch history, or local notes. If the current user request does not explicitly provide an issue/MR URL or IID, create a new issue/MR for the new submission.
 
 ## Fallback Output
 

@@ -18,6 +18,7 @@ Create and manage a review-ready GitLab merge request from a local repository, i
 - A completed MR must include a readable Chinese overview that explains the intent, main changes, impact scope, and verification suggestions. Do not use the overview to merely repeat diff stat; GitLab already shows file-level statistics in the Changes tab.
 - `approve` does not close issues. GitLab closes issues after merge when the MR description or commit message contains `Closes #N`, `Fixes #N`, or `Resolves #N`.
 - Target the GitLab project default branch by default. If a requested target branch is not the project default branch, stop and explain that issue auto-close may not run unless the user explicitly accepts a non-default target.
+- Do not reuse an existing issue or MR from memory, branch history, or an earlier session. Reuse only when the current user request explicitly provides an issue/MR URL or IID, or explicitly says to update a named existing issue/MR. Otherwise create a new issue and a new MR.
 - For multiple repositories or worktrees, complete the full checklist per path. Do not count a worktree as done until its intended branch has committed changes, an upstream remote branch, and a matching MR.
 - Preserve unrelated user changes. Stage only files intended for the requested MR.
 
@@ -45,6 +46,7 @@ Create and manage a review-ready GitLab merge request from a local repository, i
    git config --local --add credential.helper ''
    git config --local --add credential.helper store
    ```
+   For GitLab REST API calls, prefer a real API token from `GITLAB_TOKEN`, `GITLAB_PERSONAL_ACCESS_TOKEN`, `MARKETPLACE_ZXGC_ENV_FILE`, or the approved local env source `~/.claude/feishu.env`. Git HTTPS credentials may push successfully but still return `401 Unauthorized` from the GitLab API.
 
 4. Push and verify upstream:
    ```bash
