@@ -12,6 +12,7 @@ Use this skill to make codebase exploration start from the durable multi-repo gr
 - Top index: `$CODEX_HOME/memories/index-code-graph.md` (use `~/.codex/memories/index-code-graph.md` if `CODEX_HOME` is unset)
 - Command helper: `$CODEX_HOME/skills/kg-code/scripts/kg_code.py`
 - Regression eval helper: `$CODEX_HOME/skills/kg-code/scripts/kg_code_eval.py`
+- Dependency skill bootstrap: `python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code.py" ensure-skills --include-remote`
 - Local graph CLI: `code-review-graph`
 - Local MCP server: `code-review-graph`
 - c250 remote wrapper: `c250-exec`, with common repo `/home/chehejia/cov-evalution`
@@ -31,9 +32,12 @@ Use this skill to make codebase exploration start from the durable multi-repo gr
 - `create`: build or refresh code graph artifacts.
 - `query`: answer from existing code graph artifacts and document layers.
 
+Before `create` or `query`, the helper automatically checks dependent Codex skills and installs missing ones from known local sources when possible. Core dependent skills are `marketplace-zxgc`, `codex-remote-container`, and `codex-ssh-remote-config`; c250 remote aliases also require `c250`.
+
 Use the helper directly when the user asks for one of these operations:
 
 ```bash
+python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code.py" ensure-skills --include-remote
 python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code.py" create --repo rllm --tools code-review-graph,graphify,understand-compatible
 python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code.py" query --repo rllm "APR SFT training shell" --limit 10
 python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code_eval.py"
@@ -62,6 +66,11 @@ python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code_eval.py"
   - Local implementation: searches `.code-review-graph/graph.db`, `graphify-out/graph.json` or `.understand-anything/knowledge-graph.json`, then Markdown/shell/Python/config files as fallback.
   - Remote aliases: `cov-evalution`, `cov-evalution-qwen3_6`, `code-complete-c250`, `rllm-lpai-dev`, and `code-complete-lpai-dev` route through `c250-exec` or `ssh lpai-zyy-dev` and combine remote file/doc scans with GitNexus query output.
   - Example: `python3 "$CODEX_HOME/skills/kg-code/scripts/kg_code.py" query --repo rllm "train_smolagents_prod" --json`.
+- `ensure-skills` parameter:
+  - Purpose: check and install missing dependent Codex skills.
+  - Install sources, in order: `KG_CODE_SKILL_SOURCE_ROOTS`, current active skills directory, `~/marketplace-zxgc/plugins/marketplace-zxgc/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.claude/skills`, and c250-style marketplace/Codex paths.
+  - It copies only skill files and excludes `__pycache__`, `.pyc`, and `.DS_Store`.
+  - Use `--check-only` to report without installation and `--include-remote` to include `c250`.
 - Structural build: `code-review-graph build/update/status` for Python, shell, Rust, and other source files.
 - MCP query: `list_graph_stats`, `get_architecture_overview`, `get_review_context`, and `cross_repo_search`.
 - SQLite/file exact query: inspect `.code-review-graph/graph.db` or test exact paths when a file-level answer is required.

@@ -15,9 +15,10 @@
 - `code-refactor`: automated helper commands for autocommit, autofix, autosummary, autodoc, autointerpret, and auto-merge-request workflows.
 - `codex-hooks` and `codex-hook`: hook configuration workflows.
 - `codex-remote-container` and `codex-ssh-remote-config`: remote Codex/container workflows.
+- `c250`: optional c250 remote workflow skill, packaged so `kg-code ensure-skills --include-remote` can install its missing dependency without making it a default active skill.
 - `algorithm-engineer-workflow`: top-level algorithm engineering workflow for ML data, training, evaluation, TensorBoard, RL, and agent trace work.
 - `algorithm-data-diagnosis`, `algorithm-tensorboard-analysis`, `algorithm-training-debug`, `algorithm-training-review`, `algorithm-rl-debug`, `algorithm-eval-diagnosis`, `algorithm-eval-closure`, and `algorithm-agent-trace-analysis`: focused algorithm engineering diagnosis and review skills.
-- `kg-code`: multi-repository code graph create/query workflow with code-review-graph, graphify, GitNexus, Understand-Anything-compatible artifacts, c250, and lpai-dev routing. It is packaged for opt-in sync, not default activation.
+- `kg-code`: multi-repository code graph create/query workflow with code-review-graph, graphify, GitNexus, Understand-Anything-compatible artifacts, c250, and lpai-dev routing. It is packaged for opt-in sync, not default activation, and can auto-install missing dependent skills from local skill sources.
 - `task2zxgc`: task export workflow.
 - `agent-memory-mcp`: optional persistent memory MCP workflow. It is installed with its MCP server by `scripts/install-agent-memory-mcp.sh`, not by default skill sync.
 

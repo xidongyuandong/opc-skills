@@ -20,6 +20,16 @@ from pathlib import Path
 from typing import Iterable
 
 
+CORE_DEPENDENT_SKILLS = [
+    "marketplace-zxgc",
+    "codex-remote-container",
+    "codex-ssh-remote-config",
+]
+
+REMOTE_DEPENDENT_SKILLS = [
+    "c250",
+]
+
 DEFAULT_ALIASES = {
     "rllm": "/Users/zhengyuyu/programs/lixiang/rllm",
     "code-complete": "/Users/zhengyuyu/programs/lixiang/code-complete",
@@ -55,6 +65,121 @@ REMOTE_ALIASES = {
         "gitnexus": "code-complete-lpai-dev",
     },
 }
+
+
+def codex_home() -> Path:
+    return Path(os.environ.get("CODEX_HOME", "~/.codex")).expanduser()
+
+
+def skill_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def active_skill_dir(name: str) -> Path:
+    return codex_home() / "skills" / name
+
+
+def is_skill_installed(name: str) -> bool:
+    return (active_skill_dir(name) / "SKILL.md").is_file()
+
+
+def default_skill_source_roots() -> list[Path]:
+    roots = []
+    env_roots = os.environ.get("KG_CODE_SKILL_SOURCE_ROOTS", "")
+    for raw in env_roots.split(os.pathsep):
+        if raw:
+            roots.append(Path(raw).expanduser())
+    roots.extend(
+        [
+            skill_root().parent,
+            Path("~/marketplace-zxgc/plugins/marketplace-zxgc/skills").expanduser(),
+            Path("~/.codex/skills").expanduser(),
+            Path("~/.agents/skills").expanduser(),
+            Path("~/.claude/skills").expanduser(),
+            Path("/data/jenkins/marketplace-zxgc/plugins/marketplace-zxgc/skills"),
+            Path("/data/jenkins/.codex/home/skills"),
+        ]
+    )
+    deduped = []
+    seen = set()
+    for root in roots:
+        try:
+            key = str(root.resolve())
+        except OSError:
+            key = str(root)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(root)
+    return deduped
+
+
+def find_skill_source(name: str) -> Path | None:
+    target = active_skill_dir(name).resolve()
+    for root in default_skill_source_roots():
+        candidate = root / name
+        if not (candidate / "SKILL.md").is_file():
+            continue
+        try:
+            if candidate.resolve() == target:
+                continue
+        except OSError:
+            pass
+        return candidate
+    return None
+
+
+def copy_skill_tree(src: Path, dst: Path) -> None:
+    if dst.exists():
+        backup = codex_home() / "backups" / "skills" / f"kg-code-autoinstall-{os.getpid()}" / dst.name
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(dst), str(backup))
+
+    def ignore(_dir: str, names: list[str]) -> set[str]:
+        return {name for name in names if name == "__pycache__" or name.endswith(".pyc") or name == ".DS_Store"}
+
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, dst, ignore=ignore)
+
+
+def ensure_dependent_skills(extra: Iterable[str] = (), install: bool = True) -> list[dict]:
+    wanted = [*CORE_DEPENDENT_SKILLS, *extra]
+    results = []
+    seen = set()
+    for name in wanted:
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        dst = active_skill_dir(name)
+        if is_skill_installed(name):
+            results.append({"skill": name, "status": "present", "path": str(dst)})
+            continue
+        if not install:
+            results.append({"skill": name, "status": "missing", "path": str(dst)})
+            continue
+        src = find_skill_source(name)
+        if not src:
+            results.append(
+                {
+                    "skill": name,
+                    "status": "missing-source",
+                    "path": str(dst),
+                    "searched": [str(root) for root in default_skill_source_roots()],
+                }
+            )
+            continue
+        try:
+            copy_skill_tree(src, dst)
+            results.append({"skill": name, "status": "installed", "source": str(src), "path": str(dst)})
+        except OSError as exc:
+            results.append({"skill": name, "status": "error", "source": str(src), "path": str(dst), "error": str(exc)})
+    return results
+
+
+def ensure_for_repo(repo_value: str | None, install: bool = True) -> list[dict]:
+    extra = []
+    if repo_value in REMOTE_ALIASES and REMOTE_ALIASES[repo_value]["kind"] == "c250":
+        extra.extend(REMOTE_DEPENDENT_SKILLS)
+    return ensure_dependent_skills(extra=extra, install=install)
 
 
 def resolve_repo(value: str) -> Path:
@@ -485,6 +610,11 @@ def query_remote(alias: str, spec: dict, query: str, limit: int) -> list[dict]:
 
 
 def cmd_create(args: argparse.Namespace) -> int:
+    dep_results = ensure_dependent_skills(install=not args.no_auto_install_skills)
+    dep_errors = [item for item in dep_results if item["status"] in {"missing-source", "error"}]
+    if dep_errors:
+        print(json.dumps({"dependency_skills": dep_results}, ensure_ascii=False, indent=2), file=sys.stderr)
+
     tools = set(args.tools.split(","))
     all_results = []
     for repo_arg in args.repo:
@@ -496,6 +626,11 @@ def cmd_create(args: argparse.Namespace) -> int:
 
 
 def cmd_query(args: argparse.Namespace) -> int:
+    dep_results = ensure_for_repo(args.repo, install=not args.no_auto_install_skills)
+    dep_errors = [item for item in dep_results if item["status"] in {"missing-source", "error"}]
+    if dep_errors:
+        print(json.dumps({"dependency_skills": dep_results}, ensure_ascii=False, indent=2), file=sys.stderr)
+
     if args.repo in REMOTE_ALIASES:
         spec = REMOTE_ALIASES[args.repo]
         results = query_remote(args.repo, spec, args.query, args.limit)
@@ -554,6 +689,7 @@ def build_parser() -> argparse.ArgumentParser:
         default="code-review-graph,graphify,understand-compatible",
         help="comma-separated: code-review-graph,graphify,gitnexus,understand-compatible",
     )
+    create.add_argument("--no-auto-install-skills", action="store_true", help="only report missing dependent skills")
     create.set_defaults(func=cmd_create)
 
     query = sub.add_parser("query", help="query existing graph artifacts")
@@ -561,8 +697,33 @@ def build_parser() -> argparse.ArgumentParser:
     query.add_argument("query", help="query text")
     query.add_argument("--limit", type=int, default=10)
     query.add_argument("--json", action="store_true")
+    query.add_argument("--no-auto-install-skills", action="store_true", help="only report missing dependent skills")
     query.set_defaults(func=cmd_query)
+
+    ensure = sub.add_parser("ensure-skills", help="install missing kg-code dependent skills from known local sources")
+    ensure.add_argument("--include-remote", action="store_true", help="also ensure remote-operation skills such as c250")
+    ensure.add_argument("--check-only", action="store_true", help="report missing skills without installing them")
+    ensure.add_argument("--json", action="store_true")
+    ensure.set_defaults(func=cmd_ensure_skills)
     return parser
+
+
+def cmd_ensure_skills(args: argparse.Namespace) -> int:
+    extra = REMOTE_DEPENDENT_SKILLS if args.include_remote else []
+    results = ensure_dependent_skills(extra=extra, install=not args.check_only)
+    payload = {"codex_home": str(codex_home()), "results": results}
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"CODEX_HOME: {payload['codex_home']}")
+        for item in results:
+            line = f"{item['skill']}: {item['status']}"
+            if item.get("source"):
+                line += f" from {item['source']}"
+            if item.get("path"):
+                line += f" -> {item['path']}"
+            print(line)
+    return 0 if all(item["status"] not in {"missing-source", "error"} for item in results) else 1
 
 
 def main(argv: list[str] | None = None) -> int:
