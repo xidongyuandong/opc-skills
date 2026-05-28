@@ -95,6 +95,8 @@ The algorithm engineering skill set is included in the default sync set:
 - `algorithm-eval-closure`
 - `algorithm-agent-trace-analysis`
 
+`kg-code` is packaged for multi-repository code graph create/query work. It is intentionally excluded from the default sync set; install it explicitly with `ZXGC_SKILLS="kg-code" .../sync-skills.sh --apply` or `c250-sync-codex --skills kg-code`. Its `ensure-skills` helper can auto-install missing dependent skills from local sources; `c250` is packaged only to support that opt-in dependency path.
+
 `task2zxgc` is intentionally excluded from the default sync set so the marketplace copy remains the only maintained copy.
 
 `agent-memory-mcp` is also excluded from the default sync set. Use `install-agent-memory-mcp.sh` so the skill, MCP server source, dependencies, and target-local `config.toml` block are installed together.
