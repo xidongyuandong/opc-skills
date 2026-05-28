@@ -64,6 +64,7 @@ Prefer `./scripts/install-marketplace-zxgc.sh --dry-run` and then `--apply` for 
 - Back up before replacing `AGENTS.md`, `hooks.json`, or existing skills.
 - Treat marketplace skill additions in two stages: packaging is allowed after validation, but default synchronization/activation requires explicit human confirmation. Prefer optional `ZXGC_SKILLS=...` instructions for low-frequency or high-impact skills.
 - Keep skill backups outside the active skills directory, such as `$CODEX_HOME/backups/skills/<timestamp>/`, so old skill copies are not rediscovered.
+- For c250 user-level `AGENTS.md` sync, do not treat local as the only source of truth. Read both local and remote `AGENTS.md`, merge durable user-level constraints, write the merged result back to both sides, then verify hashes match. If a conflict cannot be safely resolved, preserve both versions in a reviewable merge artifact instead of overwriting either side.
 - Prefer managed templates and explicit scripts over free-form manual instructions.
 - Do not mark a step as `【人工】` when it can be handled through parameters, environment variables, dry-run/apply, GitLab API, or an existing marketplace script.
 - If a step truly requires GitLab web UI, say `GitLab 网页端` explicitly and keep CLI commands as fallback only.
