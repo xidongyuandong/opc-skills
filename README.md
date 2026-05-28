@@ -126,10 +126,12 @@ The initial pack includes:
 - `algorithm-eval-diagnosis`
 - `algorithm-eval-closure`
 - `algorithm-agent-trace-analysis`
+- `kg-code`
 - `agent-memory-mcp`
 - `task2zxgc`
 
 `task2zxgc` is kept marketplace-local as the single source of truth. It is not synced into `~/.codex/skills` by default.
+`kg-code` is packaged for multi-repository code graph create/query work and is synced explicitly when needed, not by default.
 `agent-memory-mcp` is packaged with its MCP server source but is opt-in because installation writes a target-local `config.toml` MCP block. Use `plugins/marketplace-zxgc/scripts/install-agent-memory-mcp.sh` on each target machine.
 
 Skill sync backs up replaced skills under `$CODEX_HOME/backups/skills/<timestamp>/` and also moves known deprecated skill stubs out of the active skills directory.
