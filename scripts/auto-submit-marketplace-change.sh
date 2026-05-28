@@ -40,6 +40,10 @@ Options:
 
 Environment:
   MARKETPLACE_ZXGC_ENV_FILE   Optional env file containing GITLAB_TOKEN or GITLAB_PERSONAL_ACCESS_TOKEN.
+  If MARKETPLACE_ZXGC_ENV_FILE is unset, the script checks:
+    $HOME/.config/marketplace-zxgc/env
+    $HOME/.marketplace-zxgc.env
+    $HOME/.claude/feishu.env
   GITLAB_TOKEN                GitLab API token for MR creation.
   GITLAB_PERSONAL_ACCESS_TOKEN Alternative token name; mapped to GITLAB_TOKEN when needed.
 USAGE
@@ -265,6 +269,7 @@ if [ -n "${MARKETPLACE_ZXGC_ENV_FILE:-}" ]; then
 else
   load_env_file "$HOME/.config/marketplace-zxgc/env" >/dev/null || true
   load_env_file "$HOME/.marketplace-zxgc.env" >/dev/null || true
+  load_env_file "$HOME/.claude/feishu.env" >/dev/null || true
 fi
 
 if [ -n "${GITLAB_PERSONAL_ACCESS_TOKEN:-}" ] && [ -z "${GITLAB_TOKEN:-}" ]; then

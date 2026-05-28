@@ -47,19 +47,24 @@ codex plugin marketplace remove marketplace-zxgc
 ./scripts/auto-submit-marketplace-change.sh --apply --title "update marketplace"
 ```
 
+Prefer `./scripts/install-marketplace-zxgc.sh --dry-run` and then `--apply` for local marketplace refresh. Codex CLI plugin commands differ by version: some versions support installed plugin `add/list`, while newer local-marketplace flows only support `plugin marketplace add/upgrade/remove` and may reject `marketplace upgrade` for a local directory. The install script owns that compatibility check.
+
 ## Update Workflow
 
 1. Copy or edit assets inside `plugins/marketplace-zxgc/`.
 2. Keep plugin metadata in sync with added capabilities.
+   Adding a new packaged skill or capability does not imply it should be installed by default. Before adding any new skill to `scripts/sync-skills.sh` `DEFAULT_SKILLS`, or otherwise making it active on target machines, get explicit human confirmation for that exact default-sync change.
 3. When editing operation docs, classify each step as automated, parameterized, web-console manual, credential/manual, or destructive/manual before writing labels.
 4. Run `./scripts/validate-pack.sh`.
-5. Install or upgrade the marketplace with `codex plugin marketplace add` or `upgrade`.
+5. Install or refresh the marketplace with `scripts/install-marketplace-zxgc.sh`; it performs marketplace registration, plugin-cache compatibility handling, skill/rule/hook sync, and verification.
 6. Only run installation scripts with `--apply` after reviewing the dry run.
 
 ## Safety Rules
 
 - Back up before replacing `AGENTS.md`, `hooks.json`, or existing skills.
+- Treat marketplace skill additions in two stages: packaging is allowed after validation, but default synchronization/activation requires explicit human confirmation. Prefer optional `ZXGC_SKILLS=...` instructions for low-frequency or high-impact skills.
 - Keep skill backups outside the active skills directory, such as `$CODEX_HOME/backups/skills/<timestamp>/`, so old skill copies are not rediscovered.
+- For c250 user-level `AGENTS.md` sync, do not treat local as the only source of truth. Read both local and remote `AGENTS.md`, merge durable user-level constraints, write the merged result back to both sides, then verify hashes match. If a conflict cannot be safely resolved, preserve both versions in a reviewable merge artifact instead of overwriting either side.
 - Prefer managed templates and explicit scripts over free-form manual instructions.
 - Do not mark a step as `【人工】` when it can be handled through parameters, environment variables, dry-run/apply, GitLab API, or an existing marketplace script.
 - If a step truly requires GitLab web UI, say `GitLab 网页端` explicitly and keep CLI commands as fallback only.

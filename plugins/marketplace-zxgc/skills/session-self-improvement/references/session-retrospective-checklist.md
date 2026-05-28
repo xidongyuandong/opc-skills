@@ -3,11 +3,46 @@
 ## Evidence Sources
 
 - Current visible conversation.
-- Compaction summary, if present.
+- Compaction summary, if present. Treat it as summary evidence, not as raw pre-compact evidence.
+- Raw session history or query-history results, when available.
 - User corrections and explicit frustration.
 - Tool outputs that prove a cause or fix.
 - Files changed during the session.
+- Requirement, plan, task, summary, and repository docs that record durable task state.
 - Existing skill and AGENTS.md instructions.
+
+## Multi-Compact Reconstruction Checklist
+
+Use this checklist when the session contains a compact summary, may have been compacted multiple times, or the user asks to analyze the original/full context:
+
+- [ ] Identify whether the current context includes one or more compact summaries.
+- [ ] Resolve `CODEX_HOME` from the environment, defaulting to `~/.codex`.
+- [ ] Attempt to locate the earliest available raw evidence before relying on summaries.
+- [ ] Cross-check raw turns against generated artifacts such as requirement files, plan files, task files, docs, git diffs, and tool outputs.
+- [ ] Separate direct observation from inference.
+- [ ] Mark unavailable raw pre-compact content as an evidence gap.
+- [ ] Do not store raw chat logs, raw session JSONL, credentials, or sensitive payloads in persisted artifacts.
+
+## Historical Task Session Checklist
+
+Use this checklist when the current improvement depends on a task, repo, path, skill, issue, MR, or run that may have appeared in earlier sessions:
+
+- [ ] Derive task keys from requirement file path, repo path, skill names, issue/MR ids, run names, and repeated user instructions.
+- [ ] Search related history progressively: exact path or identifier first, then broader task wording if evidence is sparse.
+- [ ] Compare historical evidence with current artifacts before turning it into a durable lesson.
+- [ ] Extract recurring demands, corrections, solution patterns, and workflow gaps rather than raw conversation.
+- [ ] Record which evidence tier supports the conclusion.
+- [ ] Redact secrets and exclude transient command dumps.
+
+## Evidence Confidence Labels
+
+Use these labels when reporting or persisting retrospective conclusions:
+
+- `raw`: visible conversation, raw session history, and direct tool output.
+- `artifact`: files, diffs, docs, plans, task records, and validation records.
+- `summary`: compact summaries, prior handoffs, or human/agent summaries.
+- `inference`: conclusions reasoned from partial evidence.
+- `gap`: evidence that was requested or expected but unavailable.
 
 ## Candidate Quality Bar
 

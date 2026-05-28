@@ -1,0 +1,4 @@
+interface:
+  display_name: "Session Self Improvement Eval"
+  short_description: "Evaluate self-improvement summary quality"
+  default_prompt: "Use $session-self-improvement-eval to grade the latest session-self-improvement summary."

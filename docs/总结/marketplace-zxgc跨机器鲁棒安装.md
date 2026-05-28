@@ -9,7 +9,7 @@
 ## 证据
 
 - c250/container250 的 `CODEX_HOME` 是 `/data/jenkins/.codex/home`，不是默认 `$HOME/.codex`。如果安装脚本没有显式使用 `CODEX_HOME`，skills、rules、hooks 会落到错误目录。
-- local marketplace 拉取新代码后，`codex plugin marketplace upgrade` 不一定刷新 installed plugin cache。实测更稳妥的流程是 `plugin remove marketplace-zxgc@marketplace-zxgc` 后再 `plugin add marketplace-zxgc@marketplace-zxgc`。
+- local marketplace 拉取新代码后，刷新方式依赖 Codex CLI 版本。旧 CLI 可能支持 `codex plugin add/list`，可用 `plugin remove marketplace-zxgc@marketplace-zxgc` 后再 `plugin add marketplace-zxgc@marketplace-zxgc`；当前本机 CLI 只支持 `codex plugin marketplace add/upgrade/remove`，且本地目录 marketplace 不是 Git marketplace，`marketplace upgrade` 会提示不可用。总控脚本应兼容检测：先 `plugin marketplace add <repo>`，旧 CLI 走 installed plugin remove/add，新 CLI 对本地 marketplace 允许 upgrade 失败后继续同步 assets。
 - hooks 不能跨机器复制，因为 `hooks.json` 内需要目标机器真实的 plugin 脚本路径。必须在目标机器用模板重新渲染。
 - c250 active skills 曾残留 `auto-merge-request.moved-to-code-refactor.20260521`，会被 Codex 扫描成可用 skill。同步脚本需要把已知废弃 skill stub 移到备份目录。
 - 仅检查文件存在不够，需要 Codex smoke test 验证 hook 信任/启动路径不会阻断下一次会话。
@@ -56,7 +56,7 @@ git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLA
 ## 验证清单
 
 - `validate-pack.sh` 通过。
-- `codex plugin list` 显示 `marketplace-zxgc@marketplace-zxgc (installed, enabled)`。
+- 若 CLI 支持 `codex plugin list`，确认显示 `marketplace-zxgc@marketplace-zxgc (installed, enabled)`；若当前 CLI 没有 `plugin list`，用 `codex plugin marketplace add "$MARKETPLACE_ZXGC_HOME"` 加文件验证作为替代。
 - `$CODEX_HOME/AGENTS.md` 存在。
 - `$CODEX_HOME/hooks.json` 存在且路径指向目标机器的 `MARKETPLACE_ZXGC_HOME`。
 - `$CODEX_HOME/rules/default.rules` 存在。
@@ -64,10 +64,27 @@ git clone https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git "$MARKETPLA
 - `$CODEX_HOME/skills` 下没有 `bak`、`backup`、`moved`、`deprecated`、`auto-merge-request` 这类废弃 active skill。
 - Codex smoke test 能输出 `marketplace-zxgc smoke ok`。
 
+## 新增 skill 与默认同步治理
+
+新增 marketplace skill 只表示能力已打包，不等于应该默认安装或自动激活。后续新增 `skills/<name>/SKILL.md` 后，允许先通过 `validate-pack.sh` 校验并按需用 `ZXGC_SKILLS=<name> scripts/sync-skills.sh` 安装；但把新 skill 写入 `sync-skills.sh` 的 `DEFAULT_SKILLS`、或让它进入 c250/本机默认 active skills 清单，必须有用户对该默认同步变更的明确确认。
+
+这个边界用于避免低频、高影响能力被默认注入普通会话。`twin-agent-zyy`、`continuous-agent-loop`、`enterprise-agent-ops` 这类能力可以作为 marketplace 包存在，但默认启用要单独评估其触发频率、上下文成本、误触发风险和人工确认要求。
+
+## c250 Codex 配置同步
+
+c250 上 Codex home 为 `/data/jenkins/.codex/home`，同步配置时不能只依赖最终 `chmod`。如果 `docker cp` 或远端复制过程先落地一个权限过窄的 `config.toml`，Codex TUI 的 skills refresh 可能在修正权限前读取文件并报 `Permission denied`。
+
+稳妥做法是把 `config.toml`、`AGENTS.md` 等配置先写到同目录临时文件，对临时文件完成 `chown` 和 `chmod` 后再用 `mv -f` 原子替换目标文件。同步后至少验证：
+
+- `config.toml` 权限为 `644`，归属目标运行用户。
+- `auth.json` 权限为 `600`，归属目标运行用户。
+- `AGENTS.md` 权限为 `644`。
+- `CODEX_HOME=/data/jenkins/.codex/home codex debug prompt-input "skills refresh smoke"` 能列出预期 skills。
+
 ## 边界和风险
 
 - 总控脚本默认 `--agents-mode block`，避免直接覆盖已有 `AGENTS.md`。干净机器需要全量替换时再使用 `--agents-mode replace`。
-- smoke test 使用 `--dangerously-bypass-hook-trust` 仅用于受控安装验证，不应作为日常 Codex 启动方式。
+- smoke test 参数也依赖 Codex CLI 版本。旧 CLI 可用 `--dangerously-bypass-hook-trust --sandbox read-only`；当前 CLI 使用 `--dangerously-bypass-approvals-and-sandbox`。安装脚本应通过 `codex exec --help` 检测可用参数，不要硬编码单一版本。
 - 安装流程不保存 GitLab token、Codex auth、cookie、私钥或任何机器登录态。
 - 目标机器缺少 `jq` 时应先安装依赖，不应跳过 hooks/JSON 校验。
 
