@@ -1,6 +1,8 @@
-# marketplace-zxgc Standards Gap
+# opc-skills Standards Gap
 
-This document compares the local `marketplace-zxgc` repository with public skills marketplace patterns and records the smallest useful improvements.
+This document compares the local `opc-skills` repository with public skills marketplace patterns and records the smallest useful improvements.
+
+Some runtime paths still use legacy `marketplace-zxgc` identifiers. This task treats those as compatibility names, not public branding.
 
 ## References
 
@@ -16,8 +18,8 @@ This document compares the local `marketplace-zxgc` repository with public skill
 | Requirement | Current evidence |
 |---|---|
 | Marketplace manifest | `.agents/plugins/marketplace.json` points to the bundled local plugin. |
-| Plugin manifest | `plugins/marketplace-zxgc/.codex-plugin/plugin.json` declares metadata and skill/hook/MCP/app manifest paths. |
-| Skill directory convention | Packaged skills live under `plugins/marketplace-zxgc/skills/<skill>/SKILL.md`. |
+| Plugin manifest | `plugins/marketplace-zxgc/.codex-plugin/plugin.json` declares metadata and skill/hook/MCP/app manifest paths. The path remains legacy-compatible. |
+| Skill directory convention | Packaged skills live under `plugins/marketplace-zxgc/skills/<skill>/SKILL.md`. The path remains legacy-compatible. |
 | Local-first install path | Root README and plugin README document registration, sync, validation and install scripts. |
 | Dry-run/apply safety | Install, sync, hooks, rules and AGENTS scripts expose dry-run or explicit apply modes. |
 | Secret boundary | README and validate script reject obvious token-like values and warn against credentials. |
@@ -37,8 +39,7 @@ This document compares the local `marketplace-zxgc` repository with public skill
 
 | Gap | Recommended handling |
 |---|---|
-| GitHub publication target differs from current GitLab `origin`. | Add a GitHub remote only after confirming credentials and target repository state. Do not replace GitLab `origin` silently. |
-| Some public-facing plugin metadata still uses placeholder URLs. | Replace with public repo URLs when the GitHub target is confirmed; keep local/private URLs out of public-facing fields. |
+| Full runtime rename is not complete. | Keep `marketplace-zxgc`, `MARKETPLACE_ZXGC_HOME`, `ZXGC_SKILLS`, and `task2zxgc` as legacy identifiers until a separate migration plan covers compatibility. |
 | Skill catalog is currently hand-maintained. | Keep validate-pack coverage check. If the pack grows quickly, add a generator script that derives catalog rows from `SKILL.md` metadata. |
 | Existing worktree contains many modified/deleted files unrelated to this task. | Keep this task's diff scoped to docs, README pointers and validation checks; do not revert unrelated files. |
 | Security scanning is limited to regex-style secret detection. | For public release, add dependency/security checks appropriate to scripts and packaged tools. |

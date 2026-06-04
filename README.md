@@ -1,8 +1,8 @@
-# marketplace-zxgc
+# opc-skills
 
-ZXGC local Codex marketplace.
+OPC local Codex marketplace.
 
-This repository packages personal/user-level Codex assets as a marketplace:
+This repository packages OPC personal/user-level Codex assets as a marketplace:
 
 - `plugins/marketplace-zxgc/skills/`: selected custom skills
 - `plugins/marketplace-zxgc/templates/`: AGENTS.md, rules, and configuration templates
@@ -11,6 +11,17 @@ This repository packages personal/user-level Codex assets as a marketplace:
 - `.agents/plugins/marketplace.json`: marketplace catalog
 
 It is intentionally local-first. Do not add auth files, tokens, cookies, private keys, or raw credential output.
+
+## Legacy Runtime Names
+
+This public repository is published as `opc-skills`. Some runtime identifiers are intentionally still legacy-compatible:
+
+- local source directory examples may still use `marketplace-zxgc`;
+- plugin and skill paths may still use `plugins/marketplace-zxgc`;
+- environment variables such as `MARKETPLACE_ZXGC_HOME` and `ZXGC_SKILLS` remain supported;
+- the `task2zxgc` application name remains unchanged for compatibility.
+
+Do not rename those runtime identifiers without a separate migration plan.
 
 ## Install On Other Machines
 
@@ -51,7 +62,7 @@ codex plugin marketplace upgrade marketplace-zxgc
 
 ## Submit Updates
 
-The repository remote is:
+The legacy internal repository remote is:
 
 ```bash
 https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git

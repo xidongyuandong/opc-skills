@@ -1,8 +1,8 @@
-# marketplace-zxgc
+# opc-skills
 
-Local Codex marketplace for ZXGC workflows.
+Local Codex marketplace for OPC workflows.
 
-This marketplace packages selected user-level Codex assets:
+This marketplace packages selected OPC user-level Codex assets:
 
 - custom skills
 - AGENTS.md templates
@@ -12,6 +12,10 @@ This marketplace packages selected user-level Codex assets:
 - plugin and marketplace manifests
 
 It intentionally excludes authentication files, tokens, cookies, private keys, and raw credential output.
+
+## Legacy Runtime Names
+
+The public marketplace name is `opc-skills`. The current plugin directory, several scripts, and environment variables still use `marketplace-zxgc` / `ZXGC` as legacy runtime identifiers. Keep those names unless a separate compatibility migration is planned.
 
 ## Optional MCP: agentMemory
 

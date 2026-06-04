@@ -4,7 +4,7 @@ set -euo pipefail
 PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MARKETPLACE_ROOT="$(cd "$PLUGIN_ROOT/../.." && pwd)"
 
-echo "Validating marketplace-zxgc at $MARKETPLACE_ROOT"
+echo "Validating opc-skills at $MARKETPLACE_ROOT"
 
 if [ -f "$MARKETPLACE_ROOT/.agents/plugins/marketplace.json" ]; then
   jq empty "$MARKETPLACE_ROOT/.agents/plugins/marketplace.json"
@@ -57,6 +57,10 @@ if command -v rg >/dev/null 2>&1; then
   rg -q 'marketplace-architecture.md' "$MARKETPLACE_ROOT/README.md"
   rg -q 'skills-catalog.md' "$MARKETPLACE_ROOT/README.md"
   rg -q 'marketplace-standards-gap.md' "$MARKETPLACE_ROOT/README.md"
+  rg -q 'opc-skills|OPC' "$MARKETPLACE_ROOT/README.md"
+  rg -q 'opc-skills|OPC' "$PLUGIN_ROOT/README.md"
+  rg -q 'OPC Agent Pack' "$PLUGIN_ROOT/.codex-plugin/plugin.json"
+  rg -q 'https://github.com/yiyepiaoling0715/opc-skills' "$PLUGIN_ROOT/.codex-plugin/plugin.json"
 
   missing_catalog=0
   while IFS= read -r skill_dir; do
@@ -98,4 +102,4 @@ if command -v rg >/dev/null 2>&1; then
   fi
 fi
 
-echo "marketplace-zxgc validation passed"
+echo "opc-skills validation passed"

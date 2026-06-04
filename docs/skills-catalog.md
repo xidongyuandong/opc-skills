@@ -1,6 +1,6 @@
-# marketplace-zxgc Skills Catalog
+# opc-skills Skills Catalog
 
-This catalog summarizes the packaged skills under `plugins/marketplace-zxgc/skills`. The source of truth for each workflow remains that skill's `SKILL.md`; this file is the marketplace-level discovery view.
+This catalog summarizes the packaged skills under the legacy-compatible `plugins/marketplace-zxgc/skills` path. The source of truth for each workflow remains that skill's `SKILL.md`; this file is the marketplace-level discovery view.
 
 ## Catalog Rules
 
@@ -53,3 +53,6 @@ The current default sync set includes self-improvement, hook, remote setup, algo
 
 If a new skill is added to the pack, update this catalog and decide separately whether default sync is justified.
 
+## Naming Compatibility
+
+The public marketplace direction is `opc-skills`. The `marketplace-zxgc` and `task2zxgc` skill names are preserved as legacy runtime identifiers until a separate migration plan changes active skill names, environment variables, scripts, and installation paths together.
