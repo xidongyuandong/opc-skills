@@ -21,6 +21,9 @@ test -d "$PLUGIN_ROOT/scripts"
 test -d "$PLUGIN_ROOT/templates"
 test -f "$PLUGIN_ROOT/templates/AGENTS.global.md"
 test -f "$PLUGIN_ROOT/templates/rules/default.rules"
+test -f "$MARKETPLACE_ROOT/docs/marketplace-architecture.md"
+test -f "$MARKETPLACE_ROOT/docs/skills-catalog.md"
+test -f "$MARKETPLACE_ROOT/docs/marketplace-standards-gap.md"
 
 bash -n "$PLUGIN_ROOT/scripts/install-agents-md.sh"
 bash -n "$PLUGIN_ROOT/scripts/install-hooks.sh"
@@ -43,6 +46,27 @@ if command -v rg >/dev/null 2>&1 && [ -f "$MARKETPLACE_ROOT/操作指导.md" ]; 
   fi
   if rg -n '【人工】.*(MR|GitLab|源分支|source branch|删除.*分支)' "$MARKETPLACE_ROOT/操作指导.md" | rg -v 'GitLab 网页端|网页端不可用|不要删除仍有未合并提交的分支'; then
     echo "操作指导.md contains GitLab/manual branch wording without explicit GitLab web UI context." >&2
+    exit 1
+  fi
+fi
+
+if command -v rg >/dev/null 2>&1; then
+  rg -q 'System Map|Ownership Boundaries|Execution Flows' "$MARKETPLACE_ROOT/docs/marketplace-architecture.md"
+  rg -q 'Packaged Skills|Default sync|Opt-in' "$MARKETPLACE_ROOT/docs/skills-catalog.md"
+  rg -q 'References|Already Satisfies|Remaining Gaps|Open Publication Gate' "$MARKETPLACE_ROOT/docs/marketplace-standards-gap.md"
+  rg -q 'marketplace-architecture.md' "$MARKETPLACE_ROOT/README.md"
+  rg -q 'skills-catalog.md' "$MARKETPLACE_ROOT/README.md"
+  rg -q 'marketplace-standards-gap.md' "$MARKETPLACE_ROOT/README.md"
+
+  missing_catalog=0
+  while IFS= read -r skill_dir; do
+    skill_name="$(basename "$skill_dir")"
+    if ! rg -q "\`$skill_name\`" "$MARKETPLACE_ROOT/docs/skills-catalog.md"; then
+      echo "docs/skills-catalog.md missing packaged skill: $skill_name" >&2
+      missing_catalog=1
+    fi
+  done < <(find "$PLUGIN_ROOT/skills" -mindepth 1 -maxdepth 1 -type d | sort)
+  if [ "$missing_catalog" -ne 0 ]; then
     exit 1
   fi
 fi

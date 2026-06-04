@@ -25,6 +25,12 @@ For the current Chinese automated installation guide, use [操作指导.md](操�
 
 For a Chinese overview of packaged skills and when to use them, see [技能介绍.md](技能介绍.md).
 
+For maintainers and agents that need to inspect this marketplace quickly:
+
+- [docs/marketplace-architecture.md](docs/marketplace-architecture.md) maps manifests, skills, scripts, templates, hooks, tools, validation, and sync flows.
+- [docs/skills-catalog.md](docs/skills-catalog.md) lists every packaged skill, its purpose, and whether it is default-synced or opt-in.
+- [docs/marketplace-standards-gap.md](docs/marketplace-standards-gap.md) compares this local marketplace with public skills marketplace patterns and records remaining publication gaps.
+
 ## Register With Codex
 
 ```bash

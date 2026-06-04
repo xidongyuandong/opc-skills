@@ -39,6 +39,12 @@ AGENT_MEMORY_WORKSPACE=/data/jenkins \
 
 For the full cross-machine installation and usage guide, see the repository-level `docs/install-on-other-machines.md`.
 
+For repository maintainers, see the repository-level marketplace docs:
+
+- `docs/marketplace-architecture.md`: marketplace logic map and ownership boundaries.
+- `docs/skills-catalog.md`: packaged skills, purposes, and default-sync policy.
+- `docs/marketplace-standards-gap.md`: public marketplace standards comparison and open publication gates.
+
 ## Install
 
 From any shell:
