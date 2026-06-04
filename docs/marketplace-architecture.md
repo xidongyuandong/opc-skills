@@ -1,6 +1,8 @@
-# marketplace-zxgc Architecture
+# opc-skills Architecture
 
-This document maps how the local-first `marketplace-zxgc` repository is wired. It is intended for agents and maintainers who need to inspect, validate, install, or extend the marketplace without rediscovering the repository shape from scratch.
+This document maps how the local-first `opc-skills` repository is wired. It is intended for agents and maintainers who need to inspect, validate, install, or extend the marketplace without rediscovering the repository shape from scratch.
+
+The public repository and marketplace direction are `opc-skills`. Several runtime paths and identifiers still use the legacy `marketplace-zxgc` name for compatibility; they are called out as legacy/runtime names below.
 
 ## System Map
 
@@ -45,8 +47,8 @@ flowchart TD
 | Area | Path | Owned by marketplace | Notes |
 |---|---|---|---|
 | Marketplace catalog | `.agents/plugins/marketplace.json` | Yes | Points Codex marketplace discovery at the bundled plugin. |
-| Plugin metadata | `plugins/marketplace-zxgc/.codex-plugin/plugin.json` | Yes | Public-facing plugin metadata, skill path, hooks, MCP and app manifests. |
-| Skills | `plugins/marketplace-zxgc/skills/*/SKILL.md` | Yes | Packaged skills. Packaging a skill is separate from default activation on target machines. |
+| Plugin metadata | `plugins/marketplace-zxgc/.codex-plugin/plugin.json` | Yes | Public-facing plugin metadata, skill path, hooks, MCP and app manifests. Path is legacy-compatible. |
+| Skills | `plugins/marketplace-zxgc/skills/*/SKILL.md` | Yes | Packaged skills. Packaging a skill is separate from default activation on target machines. Path is legacy-compatible. |
 | Default sync policy | `plugins/marketplace-zxgc/scripts/sync-skills.sh` | Yes | `DEFAULT_SKILLS` controls which packaged skills become active by default. Adding a skill here requires explicit confirmation. |
 | Install scripts | `scripts/*.sh`, `plugins/marketplace-zxgc/scripts/*.sh` | Yes | Dry-run/apply scripts for registration, sync, hooks, rules, AGENTS template and optional MCP. |
 | Templates | `plugins/marketplace-zxgc/templates/**` | Yes | Portable, secret-free user-level templates only. Do not mirror raw local runtime rules. |
@@ -89,7 +91,7 @@ The public references inspected for this repository are:
 - https://github.com/MiniMax-AI/skills
 - https://github.com/VoltAgent/awesome-openclaw-skills
 
-Common patterns relevant to `marketplace-zxgc`:
+Common patterns relevant to `opc-skills`:
 
 | Requirement | Public pattern | Local adaptation |
 |---|---|---|
@@ -98,5 +100,4 @@ Common patterns relevant to `marketplace-zxgc`:
 | Install paths | Repos describe global/project install and agent-specific locations. | Installer scripts use `$MARKETPLACE_ZXGC_HOME` and `$CODEX_HOME`; optional MCP remains explicit. |
 | Validation | Public packs expose validation or contribution checks. | `validate-pack.sh` enforces manifests, script syntax, documentation, catalog coverage and secret scan. |
 | Safety | Public registries warn users to review skills and sources before install. | Local pack is secret-free, local-first and requires dry-run/apply for target writes. |
-| Single source of truth | Installers prefer canonical copies or controlled sync. | Packaged skills live under `plugins/marketplace-zxgc/skills`; default activation is separately controlled by `DEFAULT_SKILLS`. |
-
+| Single source of truth | Installers prefer canonical copies or controlled sync. | Packaged skills live under the legacy-compatible `plugins/marketplace-zxgc/skills`; default activation is separately controlled by `DEFAULT_SKILLS`. |
