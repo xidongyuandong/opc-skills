@@ -1,0 +1,45 @@
+{
+  "name": "marketplace-zxgc",
+  "version": "0.1.0",
+  "description": "Personal Codex capability pack for OPC workflows: custom skills, AGENTS templates, hooks, and maintenance scripts.",
+  "author": {
+    "name": "zhengyuyu",
+    "email": "local-only@example.com",
+    "url": "https://github.com/yiyepiaoling0715/opc-skills"
+  },
+  "homepage": "https://github.com/yiyepiaoling0715/opc-skills",
+  "repository": "https://github.com/yiyepiaoling0715/opc-skills",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "skills",
+    "hooks",
+    "agents",
+    "opc"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks.json",
+  "mcpServers": "./.mcp.json",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "OPC Agent Pack",
+    "shortDescription": "Custom Codex skills, hooks, scripts, and AGENTS templates",
+    "longDescription": "A local-first plugin pack that turns OPC personal Codex workflows into a maintainable marketplace asset. It packages selected custom skills, learning hooks, AGENTS.md templates, and safe install/sync scripts without including secrets or auth files. Runtime identifiers such as marketplace-zxgc are preserved for compatibility.",
+    "developerName": "zhengyuyu",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/yiyepiaoling0715/opc-skills",
+    "privacyPolicyURL": "https://github.com/yiyepiaoling0715/opc-skills",
+    "termsOfServiceURL": "https://github.com/yiyepiaoling0715/opc-skills",
+    "defaultPrompt": [
+      "Use opc-skills to manage my Codex skills",
+      "Sync OPC skills into this Codex home",
+      "Install the OPC AGENTS.md template"
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}
