@@ -1,9 +1,9 @@
 ---
 name: marketplace-zxgc
-description: Maintain the local ZXGC Codex marketplace plugin pack, including packaged skills, AGENTS.md templates, hook scripts, install scripts, and validation. Use when asked to update, install, sync, validate, or explain marketplace-zxgc.
+description: Maintain the local OPC/opc-skills Codex marketplace plugin pack while preserving legacy marketplace-zxgc runtime identifiers, including packaged skills, AGENTS.md templates, hook scripts, install scripts, catalog docs, and validation. Use when asked to update, install, sync, validate, rename, or explain marketplace-zxgc/opc-skills.
 ---
 
-# Marketplace ZXGC
+# Marketplace OPC / marketplace-zxgc
 
 Use this skill to operate the local marketplace pack from the current cloned repository path.
 
@@ -15,6 +15,23 @@ Use this skill to operate the local marketplace pack from the current cloned rep
 - Learning and export hook scripts under `hooks/`.
 - Maintenance scripts under `scripts/`.
 - Marketplace metadata under `.agents/plugins/marketplace.json` and `.codex-plugin/plugin.json`.
+
+## Public Branding And Legacy Runtime Names
+
+The public-facing marketplace direction is `OPC` / `opc-skills`. Prefer that naming in README files, architecture docs, standards docs, public descriptions, and display metadata.
+
+Do not blindly replace every `zxgc` or `ZXGC` occurrence with `opc` or `OPC`. First classify each occurrence as public-facing, compatibility/runtime, or historical evidence.
+
+Preserve these legacy/runtime identifiers unless a separate migration plan explicitly covers install compatibility, target-machine paths, skill discovery, and rollback:
+
+- `marketplace-zxgc`
+- `plugins/marketplace-zxgc`
+- plugin package `name`
+- `MARKETPLACE_ZXGC_HOME`
+- `ZXGC_SKILLS`
+- `task2zxgc`
+
+If a rename request says `zxgc -> opc`, use the default policy `public-facing opc + legacy/runtime compatibility`: update user-visible docs and display metadata, keep runtime identifiers stable, then document the remaining legacy names as intentional compatibility anchors.
 
 ## What This Plugin Must Not Own
 
@@ -52,17 +69,34 @@ Prefer `./scripts/install-marketplace-zxgc.sh --dry-run` and then `--apply` for 
 ## Update Workflow
 
 1. Copy or edit assets inside `plugins/marketplace-zxgc/`.
-2. Keep plugin metadata in sync with added capabilities.
+2. Keep plugin metadata and `docs/skills-catalog.md` in sync with added capabilities.
    Adding a new packaged skill or capability does not imply it should be installed by default. Before adding any new skill to `scripts/sync-skills.sh` `DEFAULT_SKILLS`, or otherwise making it active on target machines, get explicit human confirmation for that exact default-sync change.
 3. When editing operation docs, classify each step as automated, parameterized, web-console manual, credential/manual, or destructive/manual before writing labels.
 4. Run `./scripts/validate-pack.sh`.
 5. Install or refresh the marketplace with `scripts/install-marketplace-zxgc.sh`; it performs marketplace registration, plugin-cache compatibility handling, skill/rule/hook sync, and verification.
 6. Only run installation scripts with `--apply` after reviewing the dry run.
 
+## Skills Catalog Workflow
+
+When adding, removing, renaming, or materially changing packaged skills, keep `docs/skills-catalog.md` as the single discoverability surface for current packaged skills.
+
+Before writing a custom catalog generator or checker, search existing local tooling first, especially `find-skills`, `skill-creator`, `plugin-creator`, `cursor-quality-inspection`, and this pack's `scripts/validate-pack.sh`. External marketplace validators can inform the design, but local validation must remain runnable without depending on external services.
+
+Minimum workflow:
+
+1. Scan `plugins/marketplace-zxgc/skills/*/SKILL.md`.
+2. Ensure every packaged skill directory appears exactly once in `docs/skills-catalog.md`.
+3. Keep each catalog row aligned with the skill's `name`, description, and current default-sync or opt-in policy.
+4. Cross-check default-sync claims against `plugins/marketplace-zxgc/scripts/sync-skills.sh`.
+5. Run `plugins/marketplace-zxgc/scripts/validate-pack.sh`.
+
+Longer term, prefer a small generator/checker that reads `SKILL.md` metadata and fails validation on missing or duplicate catalog entries. Do not block urgent marketplace PRs on that generator if the current manual catalog check passes.
+
 ## Safety Rules
 
 - Back up before replacing `AGENTS.md`, `hooks.json`, or existing skills.
 - Treat marketplace skill additions in two stages: packaging is allowed after validation, but default synchronization/activation requires explicit human confirmation. Prefer optional `ZXGC_SKILLS=...` instructions for low-frequency or high-impact skills.
+- For OPC/opc-skills branding, preserve legacy runtime identifiers until an explicit migration plan is confirmed; avoid broad text replacement across scripts, env vars, plugin names, or task-specific skill names.
 - Keep skill backups outside the active skills directory, such as `$CODEX_HOME/backups/skills/<timestamp>/`, so old skill copies are not rediscovered.
 - For c250 user-level `AGENTS.md` sync, do not treat local as the only source of truth. Read both local and remote `AGENTS.md`, merge durable user-level constraints, write the merged result back to both sides, then verify hashes match. If a conflict cannot be safely resolved, preserve both versions in a reviewable merge artifact instead of overwriting either side.
 - Prefer managed templates and explicit scripts over free-form manual instructions.
