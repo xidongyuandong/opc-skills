@@ -85,6 +85,14 @@ Apply:
 
 `code-refactor` is included in the default sync set with its `commands/` references so each subcommand can load the required procedure file.
 
+The marketplace also packages a portable core workflow chain:
+
+- `requirement-to-plan`: evidence-first planning with a one-time confirmation gate.
+- `code-exec`: confirmed implementation, testing, review, and evidence closeout.
+- `self-improvement-session`: factual retrospectives plus confirmation-gated behavior improvement candidates.
+
+These skills are packaged as generic, machine-independent derivatives. Packaging does not imply default activation; default sync remains controlled by the sync script when that script is present in the installed marketplace version.
+
 The self-improvement skill set is included in the default sync set:
 
 - `session-self-improvement`
