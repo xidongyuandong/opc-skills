@@ -32,10 +32,13 @@ This catalog summarizes the packaged skills under the legacy-compatible `plugins
 | `codex-ssh-remote-config` | Yes | Configure Codex SSH remote usage, remote Codex home, login state, network and sandbox setup. |
 | `continuous-agent-loop` | Yes | Run long-running or continuous agent tasks with loop selection, checkpoints, recovery controls and handoff boundaries. |
 | `continuous-learning-v2` | Yes | Instinct-based session learning with confidence scoring and project-scoped learning candidates. |
+| `code-exec` | No | Executes an already confirmed Plan/Todo through scoped implementation, regression checks, review, and evidence closeout. |
 | `enterprise-agent-ops` | Yes | Operate long-lived agent workloads with observability, security boundaries, rollout controls and lifecycle management. |
 | `kg-code` | No | Build and query multi-repository code knowledge graphs for architecture lookup and impact analysis. |
 | `marketplace-zxgc` | Yes | Maintain this local Codex marketplace pack, including skills, AGENTS templates, hooks, install scripts and validation. |
+| `requirement-to-plan` | No | Converts ambiguous or document-driven requirements into one evidence-based, confirmation-gated Plan/Todo. |
 | `self-improving-agent` | Yes | Compatibility alias for older self-improvement usage; route substantive work through `session-self-improvement`. |
+| `self-improvement-session` | No | Archives factual retrospectives and drafts reusable behavior improvements while requiring confirmation for behavior-changing assets. |
 | `session-self-improvement` | Yes | Review a session or idea to decide whether to update rules, AGENTS, memory, skills or docs. |
 | `session-self-improvement-eval` | Yes | Evaluate whether a completed self-improvement run produced high-quality summaries, docs and final reporting. |
 | `task2zxgc` | No | Summarize the current Codex session into a structured task report and push it to the configured report repository. |

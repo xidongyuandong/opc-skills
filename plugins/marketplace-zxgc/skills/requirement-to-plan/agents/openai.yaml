@@ -1,0 +1,4 @@
+interface:
+  display_name: "Requirement to Plan"
+  short_description: "Turn requirements into confirmed plans"
+  default_prompt: "Use $requirement-to-plan to clarify this request, compare approaches, and produce a confirmation-gated Plan/Todo."

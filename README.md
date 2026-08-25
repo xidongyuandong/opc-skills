@@ -122,6 +122,9 @@ Rules templates are curated for portable user-level behavior. Local absolute pat
 
 The initial pack includes:
 
+- `requirement-to-plan`
+- `code-exec`
+- `self-improvement-session`
 - `marketplace-zxgc`
 - `session-self-improvement`
 - `session-self-improvement-eval`
@@ -147,6 +150,14 @@ The initial pack includes:
 - `kg-code`
 - `agent-memory-mcp`
 - `task2zxgc`
+
+The generic planning, execution, and retrospective chain is packaged as:
+
+1. `requirement-to-plan`: turn ambiguous or document-driven work into one confirmation-gated Plan/Todo.
+2. `code-exec`: execute a previously confirmed Plan/Todo through scoped implementation, verification, and evidence closeout.
+3. `self-improvement-session`: archive factual learning and draft behavior-impact improvements without silently changing rules, skills, roles, memory, or knowledge bases.
+
+These three skills are portable derivatives. They intentionally exclude machine-specific absolute paths, private repository references, organization-specific workflows, and domain-specific examples.
 
 `task2zxgc` is kept marketplace-local as the single source of truth. It is not synced into `~/.codex/skills` by default.
 `kg-code` is packaged for multi-repository code graph create/query work and is synced explicitly when needed, not by default. Its helper can auto-install missing dependent skills from this marketplace pack; `c250` is packaged to support that opt-in dependency path and is not part of the default sync set.

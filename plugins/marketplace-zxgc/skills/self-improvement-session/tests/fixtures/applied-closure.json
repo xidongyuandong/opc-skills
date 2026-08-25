@@ -1,0 +1,15 @@
+{
+  "terminal_state": "applied",
+  "active_sections": {
+    "result": "The confirmed workflow guard is active.",
+    "progress": "Implementation and verification are complete.",
+    "evaluation": "Focused deterministic checks passed.",
+    "owner": "workflow engineer",
+    "trigger_status": "explicitly-invoked",
+    "next_action": "Monitor the next matching task.",
+    "terminal_state": "applied"
+  },
+  "historical_sections": {
+    "draft": "Historical draft: awaiting user confirmation."
+  }
+}
