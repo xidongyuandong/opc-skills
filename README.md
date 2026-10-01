@@ -122,36 +122,51 @@ https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
 
 ## 包含的技能
 
-初始技能包包含：
+下面按当前仓库文件区分可用技能与历史清单。安装并让客户端发现技能后，可引用技能名并提供表中输入；具体参数以对应 SKILL.md 为准。每项介绍（不含技能名）不超过100字。
 
-- `requirement-to-plan`
-- `code-exec`
-- `self-improvement-session`
-- `marketplace-zxgc`
-- `session-self-improvement`
-- `session-self-improvement-eval`
-- `twin-agent-zyy`
-- `continuous-agent-loop`
-- `enterprise-agent-ops`
-- `self-improving-agent`
-- `continuous-learning-v2`
-- `codex-hooks`
-- `codex-hook`
-- `codex-remote-container`
-- `codex-ssh-remote-config`
-- `c250`
-- `algorithm-engineer-workflow`
-- `algorithm-data-diagnosis`
-- `algorithm-tensorboard-analysis`
-- `algorithm-training-debug`
-- `algorithm-training-review`
-- `algorithm-rl-debug`
-- `algorithm-eval-diagnosis`
-- `algorithm-eval-closure`
-- `algorithm-agent-trace-analysis`
-- `kg-code`
-- `agent-memory-mcp`
-- `task2zxgc`
+### 当前仓库包含的技能
+
+| 技能 | 功能价值与用法 |
+|---|---|
+| [engineer-router](plugins/marketplace-zxgc/skills/engineer-router/SKILL.md) | 绑定项目工作区并建议职责，减少跨项目误操作；提供任务、项目标识和工作区路径调用。 |
+| [requirement-to-plan](plugins/marketplace-zxgc/skills/requirement-to-plan/SKILL.md) | 将模糊需求整理为可验收计划，减少返工；提供需求文件或目标，比较方案并生成待办。 |
+| [code-exec](plugins/marketplace-zxgc/skills/code-exec/SKILL.md) | 按已确认计划实现、测试和审查，控制改动范围；提供计划及执行授权，输出结果证据。 |
+| [multi-agent-orchestrator](plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md) | 按依赖与文件冲突安排协作，保留重试和验收；提供任务工作流及独立上下文，计算执行波次。 |
+| [self-improvement-session](plugins/marketplace-zxgc/skills/self-improvement-session/SKILL.md) | 复盘任务并归档可复用经验，减少重复错误；提供结果或纠偏记录，行为规则变更另行确认。 |
+| [marketplace-zxgc](plugins/marketplace-zxgc/skills/marketplace-zxgc/SKILL.md) | 维护技能包、目录和安装约定，保持兼容；在克隆仓库中提出更新、同步或校验需求。 |
+| [clash-verge-add-static-ip](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/SKILL.md) | 创建独立静态IP订阅并核验出口；提供原配置路径和代理资料，与核心技能一起安装。 |
+| [clash-verge-static-ip](plugins/marketplace-zxgc/skills/clash-verge-static-ip/SKILL.md) | 构建静态出口链与刷新扩展，减少更新丢失；提供配置和代理资料，先生成候选再验证。 |
+
+### 历史清单（当前仓库未提供）
+
+以下名称保留自原 README，介绍依据历史技能目录；当前没有对应发布目录，不能从本仓库直接安装，也未验证其运行效果。需先获取匹配实现，不要将历史能力视为当前可用功能。
+
+| 技能 | 功能价值与用法 |
+|---|---|
+| `session-self-improvement` | 复盘会话并筛选规则、记忆或技能改进；补齐对应技能后，提供会话记录或改进想法。 |
+| `session-self-improvement-eval` | 检查复盘摘要和交付质量，发现遗漏；补齐技能后，提供复盘产物及验收依据。 |
+| `twin-agent-zyy` | 维护特定个人助手的目标与决策记忆；补齐技能并适配身份后，提供目标和历史决策。 |
+| `continuous-agent-loop` | 管理长任务循环、检查点和恢复，减少中断丢失；补齐技能后，提供目标、停止条件和状态。 |
+| `enterprise-agent-ops` | 管理长期代理的监控和运行边界；补齐技能后，提供部署环境、运行指标和运维目标。 |
+| `self-improving-agent` | 兼容旧版自我改进入口，避免重复流程；补齐技能后，将实质复盘交给会话改进技能。 |
+| `continuous-learning-v2` | 从会话提取带置信度的经验候选，积累项目知识；补齐技能后，提供会话证据和项目范围。 |
+| `codex-hooks` | 设计、迁移和排查钩子，统一事件自动化；补齐技能后，提供目标事件、配置和预期动作。 |
+| `codex-hook` | 创建或修复单个钩子，缩小排障范围；补齐技能后，提供钩子脚本、配置及错误信息。 |
+| `codex-remote-container` | 配置远程容器中的Codex，隔离开发环境；补齐技能后，提供连接方式及容器配置。 |
+| `codex-ssh-remote-config` | 配置SSH远程Codex及网络环境；补齐技能后，提供主机、目录和登录状态，定位连接问题。 |
+| `c250` | 通过本地封装操作指定容器，支持同步和远程执行；补齐技能并适配容器后提供操作目标。 |
+| `algorithm-engineer-workflow` | 统筹数据、训练和评测诊断，明确改进路径；补齐技能后，提供模型目标、代码和实验记录。 |
+| `algorithm-data-diagnosis` | 检查数据质量、标签和泄漏，降低训练偏差；补齐技能后，提供样本、字段定义及异常表现。 |
+| `algorithm-tensorboard-analysis` | 分析损失、奖励等训练曲线，判断收敛问题；补齐技能后，提供事件文件和实验背景。 |
+| `algorithm-training-debug` | 排查训练报错、显存不足和数值异常；补齐技能后，提供脚本、配置、日志与复现步骤。 |
+| `algorithm-training-review` | 审查训练流程、指标和检查点，发现改进项；补齐技能后，提供实验产物与目标。 |
+| `algorithm-rl-debug` | 诊断强化学习奖励、KL和采样异常；补齐技能后，提供算法配置、轨迹和训练日志。 |
+| `algorithm-eval-diagnosis` | 定位评测失败、得分回退和基准漂移；补齐技能后，提供样本、评分逻辑及前后结果。 |
+| `algorithm-eval-closure` | 核对评测问题是否闭环，明确未完成项；补齐技能后，提供日志、验证结果和问题清单。 |
+| `algorithm-agent-trace-analysis` | 分析工具调用与代理轨迹，定位循环或协议故障；补齐技能后，提供脱敏轨迹和失败样例。 |
+| `kg-code` | 构建并查询代码图谱，加快定位和影响分析；补齐技能后，指定仓库索引或输入查询。 |
+| `agent-memory-mcp` | 提供持久记忆服务，支持跨会话检索；补齐服务与技能后，在目标机器配置MCP连接。 |
+| `task2zxgc` | 将会话整理为结构化报告，便于审阅追溯；补齐技能后先预览脱敏报告，获授权再推送。 |
 
 通用的规划、执行与复盘链路打包为以下技能：
 
@@ -160,6 +175,8 @@ https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
 3. `self-improvement-session`：归档事实性经验，并起草会影响行为的改进建议，不在未告知的情况下修改规则、技能、角色、记忆或知识库。
 
 这三个技能是可移植的衍生版本，有意排除了特定机器的绝对路径、私有仓库引用、组织特定工作流和特定领域示例。
+
+以下为历史打包与同步设计说明，不代表当前分支已包含相应技能或安装脚本。
 
 `task2zxgc` 保留在技能市场本地，作为唯一真源，默认不同步到 `~/.codex/skills`。
 `kg-code` 用于跨仓库代码图谱的创建和查询，按需显式同步，默认不同步。其辅助工具可从本技能包自动安装缺失的依赖技能；打包 `c250` 是为了支持这条按需启用的依赖路径，它不属于默认同步集。
