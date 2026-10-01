@@ -122,36 +122,51 @@ Rules templates are curated for portable user-level behavior. Local absolute pat
 
 ## Included Skills
 
-The initial pack includes:
+Available skills and historical entries are separated using the current repository files. After installation and discovery by your client, reference a skill name and supply the listed inputs; consult its SKILL.md for exact parameters. Each description, excluding its name, is at most 100 characters.
 
-- `requirement-to-plan`
-- `code-exec`
-- `self-improvement-session`
-- `marketplace-zxgc`
-- `session-self-improvement`
-- `session-self-improvement-eval`
-- `twin-agent-zyy`
-- `continuous-agent-loop`
-- `enterprise-agent-ops`
-- `self-improving-agent`
-- `continuous-learning-v2`
-- `codex-hooks`
-- `codex-hook`
-- `codex-remote-container`
-- `codex-ssh-remote-config`
-- `c250`
-- `algorithm-engineer-workflow`
-- `algorithm-data-diagnosis`
-- `algorithm-tensorboard-analysis`
-- `algorithm-training-debug`
-- `algorithm-training-review`
-- `algorithm-rl-debug`
-- `algorithm-eval-diagnosis`
-- `algorithm-eval-closure`
-- `algorithm-agent-trace-analysis`
-- `kg-code`
-- `agent-memory-mcp`
-- `task2zxgc`
+### Skills included in the current repository
+
+| Skill | Function, value and usage |
+|---|---|
+| [engineer-router](plugins/marketplace-zxgc/skills/engineer-router/SKILL.md) | Bind project scope for safer handoffs; provide a task, project ID and workspace. |
+| [requirement-to-plan](plugins/marketplace-zxgc/skills/requirement-to-plan/SKILL.md) | Turn requirements into a verifiable plan; provide a goal or spec to compare options. |
+| [code-exec](plugins/marketplace-zxgc/skills/code-exec/SKILL.md) | Implement and verify approved scope; provide the confirmed plan and execution approval. |
+| [multi-agent-orchestrator](plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md) | Coordinate dependencies and retries; provide workflow and context to compute ready waves. |
+| [self-improvement-session](plugins/marketplace-zxgc/skills/self-improvement-session/SKILL.md) | Learn from outcomes or corrections; provide evidence, then approve behavior changes separately. |
+| [marketplace-zxgc](plugins/marketplace-zxgc/skills/marketplace-zxgc/SKILL.md) | Maintain pack consistency; request updates, sync or validation from the cloned repository. |
+| [clash-verge-add-static-ip](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/SKILL.md) | Add an isolated static-IP subscription; provide profile and proxy details; install its core too. |
+| [clash-verge-static-ip](plugins/marketplace-zxgc/skills/clash-verge-static-ip/SKILL.md) | Keep static routes across refreshes; provide proxy/profile inputs, then build and verify candidates. |
+
+### Historical entries (not shipped in the current repository)
+
+These names come from the original README and their descriptions from the historical catalog. Their published directories are absent: they cannot be installed from this repository and their runtime behavior is unverified. Obtain a matching implementation first.
+
+| Skill | Function, value and usage |
+|---|---|
+| `session-self-improvement` | Review learning targets; obtain the skill, then provide session evidence or an improvement idea. |
+| `session-self-improvement-eval` | Find retrospective gaps; obtain the skill, then provide outputs and acceptance criteria. |
+| `twin-agent-zyy` | Maintain persona goals and decisions; obtain and adapt the skill, then provide goals and history. |
+| `continuous-agent-loop` | Recover long-running work; obtain the skill, then provide goals, stop conditions and state. |
+| `enterprise-agent-ops` | Operate persistent agents; obtain the skill, then provide environment, metrics and operating goals. |
+| `self-improving-agent` | Support legacy learning calls; obtain the skill, then route work to session-self-improvement. |
+| `continuous-learning-v2` | Extract learning candidates; obtain the skill, then provide session evidence and project scope. |
+| `codex-hooks` | Manage hook workflows; obtain the skill, then provide events, config and intended actions. |
+| `codex-hook` | Fix one hook; obtain the skill, then provide its script, config and error details. |
+| `codex-remote-container` | Set up Codex containers; obtain the skill, then provide connection and container configuration. |
+| `codex-ssh-remote-config` | Set up remote Codex; obtain the skill, then provide host, directories and login state. |
+| `c250` | Operate a designated container; obtain and adapt the skill, then provide the intended operation. |
+| `algorithm-engineer-workflow` | Coordinate ML diagnosis; obtain the skill, then provide model goals, code and experiment records. |
+| `algorithm-data-diagnosis` | Diagnose data defects; obtain the skill, then provide samples, schema and observed issues. |
+| `algorithm-tensorboard-analysis` | Analyze training curves; obtain the skill, then provide TensorBoard events and experiment context. |
+| `algorithm-training-debug` | Debug training; obtain the skill, then provide scripts, config, logs and reproduction steps. |
+| `algorithm-training-review` | Review training quality; obtain the skill, then provide experiment artifacts and goals. |
+| `algorithm-rl-debug` | Diagnose RL issues; obtain the skill, then provide algorithm config, rollouts and training logs. |
+| `algorithm-eval-diagnosis` | Diagnose eval regressions; obtain the skill, then provide cases, scoring and before/after data. |
+| `algorithm-eval-closure` | Close evaluation gaps; obtain the skill, then provide logs, verification results and open issues. |
+| `algorithm-agent-trace-analysis` | Diagnose agent traces; obtain the skill, then provide sanitized tool logs and failure examples. |
+| `kg-code` | Map code relationships; obtain the skill, then provide repositories to index or a query. |
+| `agent-memory-mcp` | Persist searchable memory; obtain the skill and server, then configure the target MCP connection. |
+| `task2zxgc` | Export traceable reports; obtain the skill, preview sanitized output, then push with approval. |
 
 The generic planning, execution, and retrospective chain is packaged as:
 
@@ -160,6 +175,8 @@ The generic planning, execution, and retrospective chain is packaged as:
 3. `self-improvement-session`: archive factual learning and draft behavior-impact improvements without silently changing rules, skills, roles, memory, or knowledge bases.
 
 These three skills are portable derivatives. They intentionally exclude machine-specific absolute paths, private repository references, organization-specific workflows, and domain-specific examples.
+
+The following describes historical packaging and sync design; it does not establish that these skills or installers exist on the current branch.
 
 `task2zxgc` is kept marketplace-local as the single source of truth. It is not synced into `~/.codex/skills` by default.
 `kg-code` is packaged for multi-repository code graph create/query work and is synced explicitly when needed, not by default. Its helper can auto-install missing dependent skills from this marketplace pack; `c250` is packaged to support that opt-in dependency path and is not part of the default sync set.
