@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clash Verge 新增静态 IP"
+  short_description: "收集配置与静态代理资料，新建带地区名称的独立订阅并分层验收"
+  default_prompt: "使用 $clash-verge-add-static-ip，为现有 Clash Verge 订阅新增静态 IP 配置；先核对必要输入，再生成候选并在订阅页登记。"

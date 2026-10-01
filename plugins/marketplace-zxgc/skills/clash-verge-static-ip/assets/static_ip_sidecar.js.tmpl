@@ -1,0 +1,65 @@
+// Generated Clash Verge profile enhancement.
+// The remote YAML is replaceable; this sidecar is the durable custom truth source.
+
+const CUSTOM_PROXY = __CUSTOM_PROXY_JSON__;
+const OPTIONS = __OPTIONS_JSON__;
+
+function copy(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function main(config, profileName) {
+  const proxies = Array.isArray(config.proxies) ? config.proxies : [];
+  const baseProxies = proxies.filter((proxy) => proxy && proxy.name !== OPTIONS.staticProxyName);
+  const excluded = OPTIONS.excludeRegex ? new RegExp(OPTIONS.excludeRegex, "i") : null;
+  const candidateNames = [];
+  const seen = new Set();
+
+  for (const proxy of baseProxies) {
+    const name = proxy && proxy.name;
+    if (!name || seen.has(name) || (excluded && excluded.test(name))) continue;
+    seen.add(name);
+    candidateNames.push(name);
+  }
+
+  if (candidateNames.length === 0) {
+    throw new Error("static-ip sidecar aborted: Auto-Best has no eligible upstream proxies");
+  }
+
+  const groups = (Array.isArray(config["proxy-groups"]) ? config["proxy-groups"] : [])
+    .filter((group) => group && group.name !== OPTIONS.autoGroupName && group.name !== OPTIONS.staticGroupName)
+    .map((group) => copy(group));
+  const entryIndex = groups.findIndex((group) => group.name === OPTIONS.entryGroupName);
+  if (entryIndex < 0) {
+    throw new Error(`static-ip sidecar aborted: source profile has no ${OPTIONS.entryGroupName} group`);
+  }
+
+  const existingEntries = Array.isArray(groups[entryIndex].proxies) ? groups[entryIndex].proxies : [];
+  groups[entryIndex].proxies = [
+    OPTIONS.staticGroupName,
+    OPTIONS.autoGroupName,
+    ...existingEntries.filter((name) => name !== OPTIONS.staticGroupName && name !== OPTIONS.autoGroupName),
+  ];
+
+  const autoGroup = {
+    name: OPTIONS.autoGroupName,
+    type: "url-test",
+    url: OPTIONS.healthCheckUrl,
+    interval: OPTIONS.interval,
+    tolerance: OPTIONS.tolerance,
+    lazy: true,
+    proxies: candidateNames,
+  };
+  const staticGroup = {
+    name: OPTIONS.staticGroupName,
+    type: "select",
+    proxies: [OPTIONS.staticProxyName],
+  };
+  groups.splice(entryIndex + 1, 0, autoGroup, staticGroup);
+
+  config.proxies = [...baseProxies, copy(CUSTOM_PROXY)];
+  config["proxy-groups"] = groups;
+  return config;
+}
+
+if (typeof module !== "undefined") module.exports = { main };
