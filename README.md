@@ -186,31 +186,30 @@ https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
 
 ## Clash Verge 静态 IP 订阅
 
-`clash-verge-add-static-ip` 收集 Clash Verge 配置文件的绝对路径，以及静态代理的协议、端点、认证信息和地区，然后指导创建独立订阅，订阅名称由原订阅名称和静态 IP 地区组成。
-远程订阅使用针对该配置的专用脚本，使自定义设置在刷新后仍然保留；本地订阅是独立快照。图形界面注册和实时出口验证是两项独立的完成检查。
+`clash-verge-add-static-ip` 先检测 Clash Verge 安装情况；未安装时引导使用官方渠道安装，无法判断时询问自定义路径，复检后再收集配置绝对路径及静态代理的协议、端点、认证和地区。新订阅名称由原订阅名称和静态 IP 地区组成。
+远程订阅使用专属脚本以保留刷新后的自定义设置；本地订阅是独立快照。图形界面登记、运行态选择和实时出口验证是独立的完成检查。
 
-将以下两个同级目录都安装到智能体的技能目录下：
+只需将以下一个自包含目录安装到智能体的技能目录下：
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R plugins/marketplace-zxgc/skills/clash-verge-add-static-ip "${CODEX_HOME:-$HOME/.codex}/skills/"
-cp -R plugins/marketplace-zxgc/skills/clash-verge-static-ip "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-这些复制命令适用于全新安装。如果任一目标目录已经存在，更新前请先检查并备份。上述操作不改变默认同步设置。
-第二个目录提供共享构建工具和模板，仅安装入口技能并不足够。构建工具需要 Ruby；离线 sidecar 测试使用 Node.js。
+上述命令适用于全新安装。如果目标目录已存在，请先检查并备份。构建器、模板与回归均已内置，无需相邻技能或运行时下载核心代码。Python 3.9+ 用于只读安装探测，Ruby 用于构建器，Node.js 用于 sidecar 合成及回归。默认同步设置不变。
+
+旧双目录版本用户请按[迁移说明](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/references/migration.md)操作：备份两目录、单独验证新版、更新旧脚本路径，再检查自己的调用方并决定是否移除旧技能。本操作不会自动删除用户已安装的文件。
 
 示例：“使用 `$clash-verge-add-static-ip`，读取我的配置文件绝对路径和私有供应商参考文件。创建一个新加坡订阅，但不要切换我当前的连接。”
 
-离线验证：
+在仓库根目录运行离线验证：
 
 ```bash
-ruby plugins/marketplace-zxgc/skills/clash-verge-static-ip/scripts/test_static_ip_workflow.rb
-ruby plugins/marketplace-zxgc/skills/clash-verge-static-ip/scripts/test_sidecar_workflow.rb
+python3 -m unittest discover -s plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/tests -v
 ```
 
-这些测试使用合成输入，不能证明图形界面注册成功、供应商可访问、实际公网出口身份正确或 IP 长期稳定。刷新时的名称冲突必须对照下载的源配置检查；当前核心逻辑不会自动拒绝此类冲突。
-绝不向本仓库加入真实配置文件、订阅 URL、凭证或生成的私有 sidecar 文件。
+测试会隔离复制这一个技能，运行两套核心回归及合成安装状态测试；不能证明三平台真实安装、应用启动、图形界面登记、供应商可访问、实际公网出口身份或 IP 长期稳定。探测器不会执行发现的二进制，文件证据也不是发行者身份鉴真。
+刷新时的名称冲突必须对照下载的源配置检查；当前核心逻辑不会自动拒绝此类冲突。绝不向本仓库加入真实配置文件、订阅 URL、凭证或生成的私有 sidecar 文件。
 
 ## 应用：task2zxgc
 

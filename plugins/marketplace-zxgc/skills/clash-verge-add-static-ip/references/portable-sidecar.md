@@ -1,5 +1,7 @@
 # Clash Verge 可移植 Sidecar Workflow
 
+本页是构建参考；先按 [安装检测](installation.md) 与 [主操作流程](operation.md) 执行。新增卡片、切换当前线路和重启分别遵循主流程的授权边界，不能因阅读本页扩大授权。
+
 ## 适用目标
 
 用于需要持续更新的远程订阅。订阅 YAML 是可替换数据；profile 绑定的 JavaScript
@@ -16,22 +18,21 @@ Global 或 Rule 流量入口
 
 ## 把 Skill 复制到另一台电脑
 
-复制整个 `clash-verge-static-ip` 目录，而不是只复制 `SKILL.md`。目标位置通常为
-`~/.agents/skills/clash-verge-static-ip/`，并应同时包含 `assets/`、`references/`、
+复制整个 `clash-verge-add-static-ip` 目录，而不是只复制 `SKILL.md`。目标位置通常为
+`~/.agents/skills/clash-verge-add-static-ip/`，并应同时包含 `assets/`、`references/`、
 `scripts/` 和 `agents/`。不要把任何生成后的真实 sidecar、订阅文件或供应商凭证
 放进 skill 目录。
 
 在新电脑执行基础自检：
 
 ```bash
-ruby ~/.agents/skills/clash-verge-static-ip/scripts/test_static_ip_workflow.rb
-ruby ~/.agents/skills/clash-verge-static-ip/scripts/test_sidecar_workflow.rb
+ruby ~/.agents/skills/clash-verge-add-static-ip/scripts/test_static_ip_workflow.rb
+ruby ~/.agents/skills/clash-verge-add-static-ip/scripts/test_sidecar_workflow.rb
 ```
 
 第二项回归需要 Node.js，仅用于执行生成后的 JavaScript 行为测试；Clash Verge
 实际加载 sidecar 时使用自身的 enhancement 运行环境。如果新电脑没有 Ruby，
-应由当地 agent 依据模板生成候选文件并做同等结构验证，不能跳过验证后直接绑定
-在线 profile。
+先按当地平台补齐正规运行依赖，再运行同一构建器；不另造一套生成实现或跳过验证。
 
 ## 禁止的迁移方式
 
@@ -52,24 +53,24 @@ ruby scripts/build_static_ip_sidecar.rb \
   --auto-group-name auto-best \
   --static-group-name '🌐 静态IP出口' \
   --entry-group-name Proxy \
-  --exclude-regex '香港|澳门|台湾|HK|MO|TW' \
   --output /tmp/static-ip-sidecar.js
 ```
+
+仅用户明确要求区域排除时才添加 `--exclude-regex`；不继承作者的地区偏好。
 
 生成器默认不覆盖已有输出。需要重新生成时，先审阅目标，再显式传 `--force`。
 输出日志只给出对象名称和路径，不打印 server、username、password 或 token。
 
 ## 在新电脑安装
 
-1. 安装兼容版本的 Clash Verge Rev/Mihomo，先用订阅 URL 在 GUI 新建远程
-   profile。不要复制旧电脑的 profile UID。
+1. 先按 [安装检测与安装复检](installation.md) 确认 Clash Verge Rev 可用；确认未安装才走安装流程。随后用订阅 URL 在 GUI 新建远程 profile，不复制旧电脑的 profile UID。
 2. 通过 Clash Verge 的“打开配置目录”定位这台电脑的真实配置目录；不要根据
    macOS、Windows 或 Linux 的经验路径硬猜。
 3. 在 GUI 新建或导入 JavaScript 类型的 profile enhancement，把候选 sidecar
    内容放入该文件。
 4. 在远程订阅的 profile chain/增强配置中绑定这个 sidecar。只修改目标 profile
    的绑定，不替换整个 profile 索引。
-5. 执行一次普通“更新”，再切换到该 profile，让 Clash Verge 生成最终配置。
+5. 执行一次普通“更新”；只有已授权切线才切换到该 profile，让 Clash Verge 生成最终配置。未授权时记录运行态未验证。
 6. 如果网络环境要求代理更新，再执行一次“更新（代理）”。两种更新都必须
    成功，且更新后 sidecar 文件内容不应被订阅下载覆盖。
 
@@ -112,7 +113,7 @@ ruby scripts/verify_sidecar_profile.rb \
 
 ## 更新、重启与回归
 
-每种更新路径和重启后重复检查：
+仅对已授权的更新/切线执行下列检查；重启仅在明确要求验证持久性并已授权时进行，否则记录该项未验证：
 
 1. 订阅节点确实更新，远程 YAML 可变化。
 2. sidecar 文件未被更新覆盖。
