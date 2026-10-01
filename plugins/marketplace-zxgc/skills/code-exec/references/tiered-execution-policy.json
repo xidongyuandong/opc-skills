@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "models": {
+    "strong": "your-primary-model",
+    "worker": "your-worker-model",
+    "scout": "your-scout-model"
+  },
+  "max_attempts": 2,
+  "max_context_chars": 12000
+}
