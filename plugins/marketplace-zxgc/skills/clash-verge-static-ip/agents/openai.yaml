@@ -1,0 +1,6 @@
+interface:
+  display_name: "Clash Verge Static IP"
+  short_description: "可移植配置并验证 Clash Verge 静态 IP 与 Auto-Best"
+  default_prompt: "使用 $clash-verge-static-ip 为远程订阅生成可持久更新的 sidecar，或为独立 YAML 构建并验收静态 IP 出口链路。"
+policy:
+  allow_implicit_invocation: true

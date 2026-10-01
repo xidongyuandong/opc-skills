@@ -26,6 +26,8 @@ This catalog summarizes the packaged skills under the legacy-compatible `plugins
 | `algorithm-training-review` | Yes | Review training workflows, scripts, TensorBoard metrics, checkpoints, reward functions, RL logs and improvement plans. |
 | `auto-issue` | No | Create, update, or draft GitLab issues from user-provided context or current repository facts. |
 | `c250` | No | Operate container250 through local wrappers and support c250-specific Codex sync or remote execution workflows. |
+| `clash-verge-add-static-ip` | No | Collect required proxy inputs and create a separate region-named Clash Verge subscription with GUI, refresh and exit validation. Install together with `clash-verge-static-ip`. |
+| `clash-verge-static-ip` | No | Shared Ruby builders, JavaScript sidecar template and offline regressions for static-IP dialer chains; required by `clash-verge-add-static-ip`. |
 | `codex-hook` | Yes | Focused single-hook creation, modification, validation and troubleshooting for Codex hook scripts/config. |
 | `codex-hooks` | Yes | Main workflow for Codex hook design, installation, migration, validation and troubleshooting. |
 | `codex-remote-container` | Yes | Configure and operate Codex inside remote Docker/devcontainer environments. |

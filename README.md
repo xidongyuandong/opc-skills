@@ -165,6 +165,43 @@ These three skills are portable derivatives. They intentionally exclude machine-
 
 Skill sync backs up replaced skills under `$CODEX_HOME/backups/skills/<timestamp>/` and also moves known deprecated skill stubs out of the active skills directory.
 
+## Clash Verge Static-IP Subscriptions
+
+`clash-verge-add-static-ip` collects a Clash Verge profile's absolute path and static-proxy
+protocol, endpoint, authentication and region, then guides creation of a separate
+subscription named after the original subscription and the static-IP region.
+Remote subscriptions use a profile-specific script so customization can survive refresh;
+Local subscriptions are independent snapshots. GUI registration and live exit verification
+are separate completion checks.
+
+Install both sibling directories under your agent's skills directory:
+
+```bash
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+cp -R plugins/marketplace-zxgc/skills/clash-verge-add-static-ip "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R plugins/marketplace-zxgc/skills/clash-verge-static-ip "${CODEX_HOME:-$HOME/.codex}/skills/"
+```
+
+These copy commands are for a fresh installation. If either destination already exists,
+review and back it up before updating it. No default sync setting is changed.
+The second directory supplies the shared builders and template; installing only the entry
+skill is insufficient. Ruby is required for builders; Node.js is used for offline sidecar tests.
+
+Example: “Use `$clash-verge-add-static-ip` with my profile's absolute path and private
+provider-reference file. Create a Singapore subscription without switching my current connection.”
+
+Offline verification:
+
+```bash
+ruby plugins/marketplace-zxgc/skills/clash-verge-static-ip/scripts/test_static_ip_workflow.rb
+ruby plugins/marketplace-zxgc/skills/clash-verge-static-ip/scripts/test_sidecar_workflow.rb
+```
+
+These tests use synthetic inputs; they do not prove GUI registration, supplier access,
+public exit identity or long-term IP stability. Refresh-time name collisions must be checked
+against the downloaded source configuration; the current core does not reject them automatically.
+Never include live profiles, subscription URLs, credentials or generated private sidecars in this repository.
+
 ## Application: task2zxgc
 
 `task2zxgc` exports the current Codex session into a structured task report and pushes it to the configured report repository. Reports include an independent `用户原始输入` section for sanitized excerpts of requirement files, command-line prompts, and user chat messages, so reviewers can evaluate whether the user provided effective task context.
