@@ -2,6 +2,8 @@
 
 Local Codex marketplace for OPC workflows.
 
+Availability: the [current catalog](../../docs/skills-catalog.md) is checked against the packaged directories. The MCP, export, and default-sync descriptions below include inherited behavior whose implementations may be absent; do not treat these historical commands as verified installation instructions.
+
 This marketplace packages selected OPC user-level Codex assets:
 
 - custom skills
@@ -41,7 +43,7 @@ AGENT_MEMORY_WORKSPACE=/data/jenkins \
 
 ## Install On Other Machines
 
-For the full cross-machine installation and usage guide, see the repository-level `docs/install-on-other-machines.md`.
+The legacy full cross-machine installation guide is not included in this public snapshot. See the [current skill catalog](../../docs/skills-catalog.md), [multi-agent setup](../../docs/multi-agent-setup.md), or [static-IP workflow](skills/clash-verge-add-static-ip/SKILL.md) for the corresponding available workflow.
 
 For repository maintainers, see the repository-level marketplace docs:
 

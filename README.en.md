@@ -27,16 +27,11 @@ Do not rename those runtime identifiers without a separate migration plan.
 
 ## Install On Other Machines
 
-For a step-by-step guide covering clone, validation, marketplace registration, skills sync, AGENTS.md, rules, hooks, verification, upgrade, and rollback, see [docs/install-on-other-machines.md](docs/install-on-other-machines.md).
-
-For the current Chinese automated installation guide, use [Automated installation guide (Simplified Chinese)](操作指导.md). The recommended team entrypoint is:
-
-```bash
-"$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --dry-run
-"$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --apply
-```
-
-For a Chinese overview of packaged skills and when to use them, see [Skill overview (Simplified Chinese)](技能介绍.md).
+The legacy full installation guide and automatic installer are not included in this
+public snapshot. For current installation options, use the [plugin README](plugins/marketplace-zxgc/README.md),
+the [multi-agent setup guide](docs/multi-agent-setup.md), or the static-IP instructions below.
+These are separate entry points, not replacements for an unavailable automatic installer.
+The [skills catalog](docs/skills-catalog.md) separates packaged skills from historical names.
 
 For maintainers and agents that need to inspect this marketplace quickly:
 
@@ -61,6 +56,18 @@ codex plugin marketplace upgrade marketplace-zxgc
 ```bash
 "$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
+
+
+Repository documentation checks (no credentials or network needed):
+
+```bash
+python3 scripts/check-doc-links.py
+python3 -m unittest discover -s tests -v
+```
+
+This checks Markdown file targets and README/catalog skill inventories, including both
+README languages. It does not check external websites or heading fragments. The same
+check runs in the independent `Documentation integrity` CI job and before other pack checks.
 
 ## Submit Updates
 
@@ -134,8 +141,7 @@ Available skills and historical entries are separated using the current reposito
 | [multi-agent-orchestrator](plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md) | Coordinate dependencies and retries; provide workflow and context to compute ready waves. |
 | [self-improvement-session](plugins/marketplace-zxgc/skills/self-improvement-session/SKILL.md) | Learn from outcomes or corrections; provide evidence, then approve behavior changes separately. |
 | [marketplace-zxgc](plugins/marketplace-zxgc/skills/marketplace-zxgc/SKILL.md) | Maintain pack consistency; request updates, sync or validation from the cloned repository. |
-| [clash-verge-add-static-ip](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/SKILL.md) | Add an isolated static-IP subscription; provide profile and proxy details; install its core too. |
-| [clash-verge-static-ip](plugins/marketplace-zxgc/skills/clash-verge-static-ip/SKILL.md) | Keep static routes across refreshes; provide proxy/profile inputs, then build and verify candidates. |
+| [clash-verge-add-static-ip](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/SKILL.md) | Self-contained static-IP workflow; check installation first, then provide profile and proxy details. No sibling skill needed. |
 
 ### Historical entries (not shipped in the current repository)
 
@@ -186,40 +192,39 @@ Skill sync backs up replaced skills under `$CODEX_HOME/backups/skills/<timestamp
 
 ## Clash Verge Static-IP Subscriptions
 
-`clash-verge-add-static-ip` collects a Clash Verge profile's absolute path and static-proxy
-protocol, endpoint, authentication and region, then guides creation of a separate
-subscription named after the original subscription and the static-IP region.
-Remote subscriptions use a profile-specific script so customization can survive refresh;
-Local subscriptions are independent snapshots. GUI registration and live exit verification
-are separate completion checks.
+`clash-verge-add-static-ip` first checks for Clash Verge. If missing, follow official
+installation and recheck; if uncertain, ask for the custom application path. Then collect
+the profile path, proxy protocol, endpoint, authentication and region to create a separate
+region-named subscription. Remote profiles use a dedicated sidecar; Local profiles are snapshots.
+GUI registration, runtime selection and live exit identity remain separate checks.
 
-Install both sibling directories under your agent's skills directory:
+Install this single self-contained directory (fresh installation only):
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
 cp -R plugins/marketplace-zxgc/skills/clash-verge-add-static-ip "${CODEX_HOME:-$HOME/.codex}/skills/"
-cp -R plugins/marketplace-zxgc/skills/clash-verge-static-ip "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
-These copy commands are for a fresh installation. If either destination already exists,
-review and back it up before updating it. No default sync setting is changed.
-The second directory supplies the shared builders and template; installing only the entry
-skill is insufficient. Ruby is required for builders; Node.js is used for offline sidecar tests.
+Back up an existing destination before updating. Builders, templates and tests are bundled;
+no sibling skill is required. Python 3.9+ runs the read-only probe, Ruby runs builders,
+and Node.js runs composition and regression tests. Default sync settings are unchanged.
+Previous users should follow the [migration guide](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/references/migration.md):
+back up, verify the new directory alone, update callers, and only then decide whether to remove the old copy.
 
-Example: “Use `$clash-verge-add-static-ip` with my profile's absolute path and private
-provider-reference file. Create a Singapore subscription without switching my current connection.”
+Example: “Use `$clash-verge-add-static-ip` with my profile path and private proxy reference.
+Create a Singapore subscription without switching my current connection.”
 
-Offline verification:
+Offline verification from the repository root:
 
 ```bash
-ruby plugins/marketplace-zxgc/skills/clash-verge-static-ip/scripts/test_static_ip_workflow.rb
-ruby plugins/marketplace-zxgc/skills/clash-verge-static-ip/scripts/test_sidecar_workflow.rb
+python3 -m unittest discover -s plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/tests -v
 ```
 
-These tests use synthetic inputs; they do not prove GUI registration, supplier access,
-public exit identity or long-term IP stability. Refresh-time name collisions must be checked
-against the downloaded source configuration; the current core does not reject them automatically.
-Never include live profiles, subscription URLs, credentials or generated private sidecars in this repository.
+Tests cover an isolated copy and synthetic installation states. They do not prove real
+installation, application launch, GUI registration, supplier access or public exit identity.
+The probe never executes discovered binaries; file evidence is not publisher verification.
+Refresh-time name collisions still require checking the downloaded source. Never publish
+real profiles, credentials, subscription URLs or private sidecars.
 
 ## Application: task2zxgc
 
@@ -254,7 +259,7 @@ python3 "$TASK2ZXGC_SCRIPT" --dry-run --agent-summary-file /tmp/task2zxgc-summar
 python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.json
 ```
 
-See [docs/install-on-other-machines.md](docs/install-on-other-machines.md#9-task2zxgc-应用说明) for team installation, posthook usage, and credential notes.
+The legacy team-installation/posthook guide and `task2zxgc` implementation are not included in this snapshot. This section describes historical behavior, not an installable application; see the [current catalog](docs/skills-catalog.md) for available skills.
 
 ## Multi-agent collaboration pack
 

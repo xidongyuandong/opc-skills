@@ -27,16 +27,8 @@ OPC 本地 Codex 技能市场。
 
 ## 在其他机器上安装
 
-分步指南涵盖克隆、验证、技能市场注册、技能同步、AGENTS.md、规则、钩子、核验、升级和回滚，详见 [docs/install-on-other-machines.md](docs/install-on-other-machines.md)。
-
-当前中文版自动安装指南见[操作指导.md](操作指导.md)。推荐团队使用以下入口：
-
-```bash
-"$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --dry-run
-"$MARKETPLACE_ZXGC_HOME/scripts/install-marketplace-zxgc.sh" --apply
-```
-
-已打包技能及其适用场景的中文概览见[技能介绍.md](技能介绍.md)。
+旧版完整安装指南和自动安装器未包含在当前公开仓库中。当前可用入口是[插件说明](plugins/marketplace-zxgc/README.md)、[多智能体配置指南](docs/multi-agent-setup.md)以及下方静态 IP 安装章节；各自适用范围不同，不能把它们当成缺失的自动安装器。
+已提供与历史技能见[技能目录](docs/skills-catalog.md)。
 
 需要快速了解本技能市场的维护者和智能体可参考：
 
@@ -61,6 +53,16 @@ codex plugin marketplace upgrade marketplace-zxgc
 ```bash
 "$HOME/marketplace-zxgc/plugins/marketplace-zxgc/scripts/validate-pack.sh"
 ```
+
+
+仓库文档独立检查（无需凭证或联网）：
+
+```bash
+python3 scripts/check-doc-links.py
+python3 -m unittest discover -s tests -v
+```
+
+检查 Markdown 文件链接、中英文 README 与技能目录是否和实际发布技能一致；不检查外站可用性或标题锚点。相同检查接入独立的 `Documentation integrity` CI，并在整包其他检查之前运行。
 
 ## 提交更新
 
@@ -134,8 +136,7 @@ https://gitlab.chehejia.com/zhengyuyu/marketplace-zxgc.git
 | [multi-agent-orchestrator](plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md) | 按依赖与文件冲突安排协作，保留重试和验收；提供任务工作流及独立上下文，计算执行波次。 |
 | [self-improvement-session](plugins/marketplace-zxgc/skills/self-improvement-session/SKILL.md) | 复盘任务并归档可复用经验，减少重复错误；提供结果或纠偏记录，行为规则变更另行确认。 |
 | [marketplace-zxgc](plugins/marketplace-zxgc/skills/marketplace-zxgc/SKILL.md) | 维护技能包、目录和安装约定，保持兼容；在克隆仓库中提出更新、同步或校验需求。 |
-| [clash-verge-add-static-ip](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/SKILL.md) | 创建独立静态IP订阅并核验出口；提供原配置路径和代理资料，与核心技能一起安装。 |
-| [clash-verge-static-ip](plugins/marketplace-zxgc/skills/clash-verge-static-ip/SKILL.md) | 构建静态出口链与刷新扩展，减少更新丢失；提供配置和代理资料，先生成候选再验证。 |
+| [clash-verge-add-static-ip](plugins/marketplace-zxgc/skills/clash-verge-add-static-ip/SKILL.md) | 创建独立静态IP订阅并核验出口；先检查 Clash Verge 安装，再提供配置路径和代理资料；仅安装此目录。 |
 
 ### 历史清单（当前仓库未提供）
 
@@ -244,7 +245,7 @@ python3 "$TASK2ZXGC_SCRIPT" --dry-run --agent-summary-file /tmp/task2zxgc-summar
 python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.json
 ```
 
-团队安装、后置钩子用法和凭证说明见 [docs/install-on-other-machines.md](docs/install-on-other-machines.md#9-task2zxgc-应用说明)。
+当前公开仓库未包含旧版团队安装/后置钩子指南及 `task2zxgc` 实现。本节保留历史行为说明，不代表当前可安装；可用技能以[当前目录](docs/skills-catalog.md)为准。
 
 ## 多智能体协作技能包
 

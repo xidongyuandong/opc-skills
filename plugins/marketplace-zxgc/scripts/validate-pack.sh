@@ -6,6 +6,9 @@ MARKETPLACE_ROOT="$(cd "$PLUGIN_ROOT/../.." && pwd)"
 
 echo "Validating opc-skills at $MARKETPLACE_ROOT"
 
+# Keep documentation failures visible even when later pack checks fail.
+python3 "$MARKETPLACE_ROOT/scripts/check-doc-links.py"
+
 if [ -f "$MARKETPLACE_ROOT/.agents/plugins/marketplace.json" ]; then
   jq empty "$MARKETPLACE_ROOT/.agents/plugins/marketplace.json"
 else
