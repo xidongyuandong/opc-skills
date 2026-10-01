@@ -7,6 +7,18 @@ description: Convert ambiguous or document-driven requirements into one evidence
 
 Turn a request into a plan that is clear enough to execute and verify. This skill plans; it does not implement the newly created plan in the same turn.
 
+## Multi-agent planning handoff
+
+For independent collaborative work, read the shared
+[planning/execution handoff](../multi-agent-orchestrator/references/planning-execution-handoff.md).
+Choose single-agent or multi-agent explicitly; small coupled work stays inline.
+Keep stable task IDs, dependency edges, difficulty, risk, allowed files, evidence
+and acceptance in the plan. The workflow is a derived execution representation,
+not a second requirements source. Keep prior attempts and results on feedback;
+refresh only affected tasks. Never treat sample confirmation as authorization.
+Install the four-skill pack described in the repository setup guide for this mode;
+ordinary planning does not require the optional scheduler.
+
 ## Core contract
 
 1. Inspect current evidence before proposing work.

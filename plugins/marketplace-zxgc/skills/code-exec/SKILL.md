@@ -84,6 +84,19 @@ Only current-task regressions authorize changes inside the confirmed scope.
 
 ## Parallel execution
 
+Install sibling `engineer-router` and `multi-agent-orchestrator` for dependency-aware
+collaboration. Read the shared [handoff](../multi-agent-orchestrator/references/planning-execution-handoff.md)
+only for collaborative tasks. Recover the same task IDs, scope and state: do not
+rebuild tasks, clear attempts, or dispatch running tasks again.
+
+The single model policy is [tiered-execution-policy.json](references/tiered-execution-policy.json).
+Replace placeholder IDs with models supported by your native delegation tool.
+`scripts/tiered_execution.py` only prepares parameters, never calls a model.
+The portable edition uses the generic `default` agent type with scoped instructions.
+Verify actual tool support; unsupported parameters return to the coordinator.
+The strong tier means coordinator work, not an automatic coordinator model change.
+Only `code-exec` is the general execution entry; no compatibility alias is shipped.
+
 Use parallel workers only when the plan has disjoint write scopes and explicit interfaces. Each worker needs:
 
 - owned files/modules;

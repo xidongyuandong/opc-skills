@@ -61,3 +61,10 @@ If a new skill is added to the pack, update this catalog and decide separately w
 ## Naming Compatibility
 
 The public marketplace direction is `opc-skills`. The `marketplace-zxgc` and `task2zxgc` skill names are preserved as legacy runtime identifiers until a separate migration plan changes active skill names, environment variables, scripts, and installation paths together.
+
+## Optional multi-agent collaboration
+
+- [engineer-router](../plugins/marketplace-zxgc/skills/engineer-router/SKILL.md): generic responsibility routing and explicit workspace context.
+- [multi-agent-orchestrator](../plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md): dependency waves, file conflict control and acceptance.
+- Existing requirement-to-plan and code-exec gain a shared handoff and a single configurable model policy.
+- [Configure the four-skill pack](multi-agent-setup.md).

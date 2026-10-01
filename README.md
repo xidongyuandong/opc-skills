@@ -236,3 +236,11 @@ python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.j
 ```
 
 See [docs/install-on-other-machines.md](docs/install-on-other-machines.md#9-task2zxgc-应用说明) for team installation, posthook usage, and credential notes.
+
+## Multi-agent collaboration pack
+
+Use `engineer-router` for explicit task context, `requirement-to-plan` for stable
+task decomposition, `code-exec` for scoped execution, and `multi-agent-orchestrator`
+for dependency waves and acceptance. Configure your own available model IDs.
+See [setup, limitations and dry run](docs/multi-agent-setup.md).
+This optional pack does not change the default sync set.
