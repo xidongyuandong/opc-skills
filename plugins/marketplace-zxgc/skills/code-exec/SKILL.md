@@ -1,198 +1,199 @@
 ---
 name: code-exec
-description: Execute an already confirmed implementation Plan/Todo through scoped changes, testing, review, verification, and evidence closeout. Use after planning is complete and the user has confirmed the executable scope.
+description: 按已确认的实现计划与待办执行限定范围的修改、测试、审查、验证和证据收尾。适用于规划已完成且用户已确认可执行范围的任务。
 ---
 
-# Code Exec
+# 代码执行
 
-Implement the confirmed plan. A code diff is not the completion target; the relevant acceptance and regression gates are.
+落实已确认的计划。完成目标是满足相关验收与回归门槛，不能仅以产生代码差异作为完成依据。
 
-## Entry gate
+本技能生成或更新的 Markdown 产物默认使用简体中文，包括正文、标题、说明与结果报告；必要的关键短语、字段名、接口名、命令、路径和链接可保留英文。
 
-Before editing:
+## 执行入口门禁
 
-1. Recover the executable source of truth: confirmed plan, issue, spec, or Todo.
-2. Re-read its scope, non-goals, validation, and rollback.
-3. Inspect current repository and worktree state.
-4. Verify historical completion claims against current files.
-5. Stop if the plan is missing, stale, ambiguous, or was newly created in the current turn.
+修改前：
 
-A short message such as “confirm, implement” should recover the latest visible plan from conversation or project artifacts. It is not a new standalone requirement. If recovery fails, ask for the plan identifier instead of inventing scope.
+1. 恢复可执行的唯一真源：已确认的计划、议题、规格或待办。
+2. 重新阅读其范围、非目标、验证方式和回滚方案。
+3. 检查当前仓库与工作树状态。
+4. 对照当前文件核验历史完成声明。
+5. 若计划缺失、过时、含糊，或刚在当前轮次创建，则停止执行。
 
-## Confirmation boundary
+“确认，执行”等简短消息，应从对话或项目产物中恢复最近可见的计划，不能视为新的独立需求。恢复失败时，询问计划标识，不要自行编造范围。
 
-A prior-turn confirmation authorizes all listed Todos, tests, repair loops, reviews, and evidence closeout. Do not pause between them.
+## 确认边界
 
-Pause only when execution would:
+前一轮的确认授权执行全部已列出的待办、测试、修复循环、审查和证据收尾；不要在这些步骤之间暂停。
 
-- leave the confirmed scope;
-- destroy or irreversibly change user data;
-- publish, send, pay, or change permissions without prior approval;
-- mutate production or remote environments outside the plan;
-- expose credentials or create significant cost, compliance, or security risk;
-- proceed without context needed for safe execution.
+仅在执行将出现以下情况时暂停：
 
-## Search before coding
+- 超出已确认范围；
+- 破坏或不可逆地更改用户数据；
+- 未经事先批准而发布、发送、支付或变更权限；
+- 在计划之外修改生产或远端环境；
+- 暴露凭证，或产生显著费用、合规或安全风险；
+- 缺少安全执行所需的上下文。
 
-Inspect existing source, tests, helpers, configuration, and local tooling before creating new behavior. Prefer repository indexes or code graphs when available, then verify important hits against real files.
+## 编码前先检索
 
-Use historical evidence only as a pointer. Current files and deterministic checks remain authoritative.
+创建新行为之前，检查已有源码、测试、辅助函数、配置和本地工具。优先使用可用的仓库索引或代码图谱，再对照真实文件核验重要命中。
 
-Use external research only when current vendor, protocol, legal, or library facts affect the implementation.
+历史证据只作为定位线索。当前文件和确定性检查仍是权威依据。
 
-## Worktree safety
+只有当前供应商、协议、法律或库的事实会影响实现时，才进行外部调研。
 
-Run:
+## 工作树安全
+
+执行：
 
 ```bash
 git status --short --branch
 git worktree list
 ```
 
-If the checkout contains unrelated changes and the task is non-trivial, use an isolated branch/worktree unless the user explicitly selected the dirty checkout. Never revert unrelated user changes.
+若当前检出包含无关改动且任务并非简单修改，应使用隔离分支或工作树，除非用户明确选择该含未提交改动的检出。绝不回退无关的用户改动。
 
-## Implementation rules
+## 实现规则
 
-- Execute only confirmed Todos, in dependency order.
-- Prefer the smallest change that satisfies the accepted behavior.
-- Reuse project patterns and helpers.
-- Do not add a second configuration or data truth.
-- Do not add test-only production switches; isolate tests through fixtures, dependency injection, or monkeypatching.
-- If new evidence changes scope or risk, stop and refresh the plan.
+- 只执行已确认的待办，并遵循依赖顺序。
+- 优先采用满足已接受行为的最小改动。
+- 复用项目模式和辅助函数。
+- 不新增第二套配置或数据真源。
+- 不添加仅为测试服务的生产开关；通过测试夹具、依赖注入或 monkeypatch 隔离测试。
+- 若新证据改变了范围或风险，停止并更新计划。
 
-## TDD and bug fixes
+## 测试驱动开发与缺陷修复
 
-For behavior changes, bugs, and refactors, prefer:
+对于行为变更、缺陷和重构，优先采用以下步骤：
 
-1. Reproduce or localize the symptom.
-2. State the root cause.
-3. Add a failing regression test when feasible.
-4. Apply the smallest production fix.
-5. Run the focused test.
-6. Broaden to contract, integration, E2E, or full regression according to impact.
+1. 复现或定位症状。
+2. 说明根因。
+3. 可行时先增加会失败的回归测试。
+4. 应用最小生产修复。
+5. 运行针对性测试。
+6. 根据影响范围，扩展到合同、集成、端到端（E2E）或全量回归验证。
 
-If a regression test is not feasible, record why and add the smallest deterministic guard available.
+如果无法添加回归测试，记录原因，并增加当前可用的最小确定性检查。
 
-Failed tests are implementation feedback. Diagnose ownership before broadening the patch:
+失败测试是实现反馈。扩大补丁前，先判定失败归属：
 
-- current-task regression;
-- unrelated dirty baseline;
-- environment/provider/manual gate;
-- unknown.
+- 当前任务引入的回归；
+- 与任务无关、已有未提交改动的基线问题；
+- 环境、供应商或人工门禁；
+- 原因未知。
 
-Only current-task regressions authorize changes inside the confirmed scope.
+只有当前任务引入的回归，才授权在已确认范围内修改。
 
-## Parallel execution
+## 并行执行
 
-Install sibling `engineer-router` and `multi-agent-orchestrator` for dependency-aware
-collaboration. Read the shared [handoff](../multi-agent-orchestrator/references/planning-execution-handoff.md)
-only for collaborative tasks. Recover the same task IDs, scope and state: do not
-rebuild tasks, clear attempts, or dispatch running tasks again.
+安装同级技能 `engineer-router` 和 `multi-agent-orchestrator`，以支持考虑依赖关系的协作。
+仅在协作任务中读取共享的[规划与执行交接合同](../multi-agent-orchestrator/references/planning-execution-handoff.md)。
+恢复相同的任务 ID、范围和状态：不得重建任务、清空尝试记录或再次分派正在运行的任务。
 
-The single model policy is [tiered-execution-policy.json](references/tiered-execution-policy.json).
-Replace placeholder IDs with models supported by your native delegation tool.
-`scripts/tiered_execution.py` only prepares parameters, never calls a model.
-The portable edition uses the generic `default` agent type with scoped instructions.
-Verify actual tool support; unsupported parameters return to the coordinator.
-The strong tier means coordinator work, not an automatic coordinator model change.
-Only `code-exec` is the general execution entry; no compatibility alias is shipped.
+模型策略的唯一真源为 [tiered-execution-policy.json](references/tiered-execution-policy.json)。
+将占位 ID 替换为原生委派工具支持的模型。
+`scripts/tiered_execution.py` 只准备参数，不调用模型。
+可移植版本使用通用的 `default` 智能体类型，并通过限定范围的指令约束任务。
+核验工具实际支持的能力；不支持的参数交回协调者处理。
+强档表示由协调者处理工作，不代表自动切换协调者模型。
+只有 `code-exec` 是通用执行入口；不提供兼容别名。
 
-Use parallel workers only when the plan has disjoint write scopes and explicit interfaces. Each worker needs:
+只有当计划包含互不重叠的写入范围和明确接口时，才使用并行工作者。每个工作者必须明确：
 
-- owned files/modules;
-- upstream dependencies;
-- expected artifact;
-- verification command;
-- forbidden scope.
+- 负责的文件或模块；
+- 上游依赖；
+- 预期产物；
+- 验证命令；
+- 禁止触及的范围。
 
-The main agent owns integration, conflict resolution, final verification, and reporting. Use serial execution for shared files or shared contracts.
+主智能体负责集成、冲突解决、最终验证和报告。涉及共享文件或共享合同时，采用串行执行。
 
-## Verification ladder
+## 逐级验证
 
-Run the smallest useful checks first, then broaden:
+先运行最小且有意义的检查，再逐步扩展：
 
-1. Syntax or static checks.
-2. Focused unit/regression tests.
-3. Contract or integration checks.
-4. Build/type/lint/security checks.
-5. E2E or real-environment validation when required by the plan.
-6. Diff and scope review.
+1. 语法或静态检查。
+2. 针对性的单元或回归测试。
+3. 合同或集成检查。
+4. 构建、类型、代码规范和安全检查。
+5. 计划要求时，进行端到端或真实环境验证。
+6. 差异和范围审查。
 
-For every meaningful result state what it proves and what it cannot prove. A structure check does not prove production behavior; a unit test does not prove deployment.
+每项有意义的结果都要说明它证明了什么、不能证明什么。结构检查不能证明生产行为，单元测试不能证明部署成功。
 
-## Review
+## 审查
 
-Use an independent review for non-trivial changes. Add security review when touching authentication, permissions, secrets, shell execution, network input, databases, or sensitive file operations.
+对非简单改动进行独立审查。触及认证、权限、密钥、Shell 执行、网络输入、数据库或敏感文件操作时，增加安全审查。
 
-Review against:
+审查以下方面：
 
-- requirement fit;
-- hidden scope expansion;
-- failure paths;
-- rollback quality;
-- test adequacy;
-- security and privacy;
-- portability and maintainability.
+- 是否符合需求；
+- 是否隐含扩大范围；
+- 失败路径；
+- 回滚质量；
+- 测试充分性；
+- 安全和隐私；
+- 可移植性和可维护性。
 
-## Evidence closeout
+## 证据收尾
 
-When the task is requirement-driven, write execution evidence to the task record, not the requirement source. Put user value before logs:
+需求驱动的任务应将执行证据写入任务记录，不写入需求真源。先说明用户价值，再列日志：
 
 ```markdown
-## Result summary
-- What changed for the user:
-- Core judgment:
-- Status:
+## 结果摘要
+- 用户可感知的变化：
+- 核心判断：
+- 状态：
 
-## Verification
-- Check:
-  - Result:
-  - Proves:
-  - Does not prove:
+## 验证
+- 检查：
+  - 结果：
+  - 证明了什么：
+  - 不能证明什么：
 
-## Intentionally not done
-- ...
+## 有意未做
+- ……
 
-## Rollback
-- ...
+## 回滚
+- ……
 
-## Evidence details
-- Changed files:
-- Commands:
-- Residual risks:
+## 证据明细
+- 改动文件：
+- 命令：
+- 残余风险：
 ```
 
-Before declaring completion, scan the confirmed Todo for unresolved markers and classify every item as completed, intentionally skipped, blocked with reason, or out of scope.
+宣布完成前，扫描已确认待办中的未解决标记，将每项归类为已完成、有意跳过、有原因的阻塞或范围之外。
 
-## Completion signature
+## 完成输出签名
 
-Final reporting should include:
+最终报告应包含：
 
-- Requirement or issue identifier, or `N/A`.
-- Requirement module.
-- Accepted outcome.
-- Actual result and user-visible behavior change.
-- Core implementation judgment.
-- Verification results with proof boundaries.
-- Next action, if any.
-- Skills/capabilities actually used.
-- Historical evidence used or skipped.
-- Important capabilities intentionally skipped and why.
-- Intentionally untouched scope.
-- Exact rollback point.
+- 需求或议题标识；不适用时写 `N/A`。
+- 需求模块。
+- 已接受的预期结果。
+- 实际结果和用户可感知的行为变化。
+- 核心实现判断。
+- 验证结果及其证明边界。
+- 后续行动（如有）。
+- 实际使用的技能或能力。
+- 使用或跳过的历史证据。
+- 有意跳过的重要能力及原因。
+- 有意未触及的范围。
+- 精确回滚点。
 
-Do not lead with file counts, test counts, or command names. They are evidence, not the result.
+不要以文件数量、测试数量或命令名称开头。它们是证据，不能代替结果。
 
-## Final checklist
+## 最终检查清单
 
-- [ ] Confirmed source of truth recovered.
-- [ ] Current worktree inspected.
-- [ ] Only confirmed scope changed.
-- [ ] Existing implementation searched before adding new code.
-- [ ] Regression/TDD route applied or explicitly skipped.
-- [ ] Focused checks passed.
-- [ ] Broader checks selected according to risk.
-- [ ] Failure ownership classified.
-- [ ] Diff reviewed for secrets and unrelated changes.
-- [ ] Evidence explains what each check proves and cannot prove.
-- [ ] Intentionally untouched scope and rollback are explicit.
+- [ ] 已恢复已确认的唯一真源。
+- [ ] 已检查当前工作树。
+- [ ] 只修改了已确认的范围。
+- [ ] 添加新代码前已检索现有实现。
+- [ ] 已采用回归测试或测试驱动开发路径，或明确说明跳过原因。
+- [ ] 针对性检查已通过。
+- [ ] 已根据风险选择更广泛的检查。
+- [ ] 已判定失败归属。
+- [ ] 已审查差异中的密钥和无关改动。
+- [ ] 证据说明了每项检查证明了什么、不能证明什么。
+- [ ] 已明确有意未触及的范围和回滚方案。

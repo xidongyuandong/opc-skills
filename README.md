@@ -237,10 +237,8 @@ python3 "$TASK2ZXGC_SCRIPT" --push --agent-summary-file /tmp/task2zxgc-summary.j
 
 See [docs/install-on-other-machines.md](docs/install-on-other-machines.md#9-task2zxgc-应用说明) for team installation, posthook usage, and credential notes.
 
-## Multi-agent collaboration pack
+## 多智能体协作技能包
 
-Use `engineer-router` for explicit task context, `requirement-to-plan` for stable
-task decomposition, `code-exec` for scoped execution, and `multi-agent-orchestrator`
-for dependency waves and acceptance. Configure your own available model IDs.
-See [setup, limitations and dry run](docs/multi-agent-setup.md).
-This optional pack does not change the default sync set.
+使用 `engineer-router` 绑定明确的任务上下文，`requirement-to-plan` 生成稳定的任务拆解，`code-exec` 在限定范围内执行，`multi-agent-orchestrator` 管理依赖波次和验收。请配置当前工具实际支持的模型 ID。
+
+详见[安装配置、使用边界和只读演练](docs/multi-agent-setup.md)。本可选包不改变默认同步集。Markdown 说明与产物默认使用简体中文，必要术语、字段、命令和链接可保持英文。

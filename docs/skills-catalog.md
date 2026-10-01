@@ -62,9 +62,9 @@ If a new skill is added to the pack, update this catalog and decide separately w
 
 The public marketplace direction is `opc-skills`. The `marketplace-zxgc` and `task2zxgc` skill names are preserved as legacy runtime identifiers until a separate migration plan changes active skill names, environment variables, scripts, and installation paths together.
 
-## Optional multi-agent collaboration
+## 可选的多智能体协作
 
-- [engineer-router](../plugins/marketplace-zxgc/skills/engineer-router/SKILL.md): generic responsibility routing and explicit workspace context.
-- [multi-agent-orchestrator](../plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md): dependency waves, file conflict control and acceptance.
-- Existing requirement-to-plan and code-exec gain a shared handoff and a single configurable model policy.
-- [Configure the four-skill pack](multi-agent-setup.md).
+- [engineer-router](../plugins/marketplace-zxgc/skills/engineer-router/SKILL.md)：通用职责路由和显式工作区上下文。
+- [multi-agent-orchestrator](../plugins/marketplace-zxgc/skills/multi-agent-orchestrator/SKILL.md)：依赖波次、文件冲突控制与验收。
+- 现有 requirement-to-plan 与 code-exec 共用交接说明和唯一可配置模型策略。
+- [配置四技能协作包](multi-agent-setup.md)。说明与 Markdown 产物默认使用简体中文。

@@ -1,229 +1,238 @@
 ---
 name: requirement-to-plan
-description: Convert ambiguous or document-driven requirements into one evidence-based, confirmation-gated Plan/Todo. Use for requirement clarification, incremental feedback, multi-step implementation planning, validation design, and rollback planning.
+description: 将模糊需求或文档驱动需求整理为基于证据、经确认后执行的唯一 Plan/Todo，适用于需求澄清、增量反馈、多步骤实现规划、验证设计和回滚规划。
 ---
 
-# Requirement To Plan
+# 从需求到计划
 
-Turn a request into a plan that is clear enough to execute and verify. This skill plans; it does not implement the newly created plan in the same turn.
+将请求整理为足以执行和验证的计划。本技能负责规划，不在创建新计划的同一轮直接实现该计划。
 
-## Multi-agent planning handoff
+本技能生成的 Markdown 文档默认使用简体中文。技术字段、代码标识、命令、必要术语和链接保持原样；用户明确要求其他语言时遵从用户要求。机器匹配依赖的 `## Module:`、`## Historical Module`、`## Superseded Module` 前缀及 `active_module_key` 字段必须原样保留，后接中文模块名称或说明；其他章节优先使用中文标题，必要时在括号中保留英文关键字。
 
-For independent collaborative work, read the shared
-[planning/execution handoff](../multi-agent-orchestrator/references/planning-execution-handoff.md).
-Choose single-agent or multi-agent explicitly; small coupled work stays inline.
-Keep stable task IDs, dependency edges, difficulty, risk, allowed files, evidence
-and acceptance in the plan. The workflow is a derived execution representation,
-not a second requirements source. Keep prior attempts and results on feedback;
-refresh only affected tasks. Never treat sample confirmation as authorization.
-Install the four-skill pack described in the repository setup guide for this mode;
-ordinary planning does not require the optional scheduler.
+## 多代理规划交接
 
-## Core contract
+对可以独立协作的任务，阅读共享的[规划与执行交接约定](../multi-agent-orchestrator/references/planning-execution-handoff.md)。明确选择单代理或多代理；规模小、耦合紧密的工作由当前代理直接处理。在计划中保留稳定任务 ID、依赖关系、难度、风险、允许文件、证据和验收标准。工作流是从计划派生的执行表示，不是第二份需求真源。收到反馈时保留之前的尝试与结果，只刷新受影响任务。不得把示例中的确认字段当作实际授权。
 
-1. Inspect current evidence before proposing work.
-2. Keep one active planning truth per requirement module.
-3. Clarify goal, scope, non-goals, assumptions, acceptance criteria, and rollback.
-4. Compare feasible approaches before choosing one.
-5. Include impact and verification for every implementation Todo.
-6. Show the Plan/Todo to the user and stop once for confirmation.
-7. A later confirmation authorizes the full listed Todo and verification set unless an exception boundary is crossed.
+此模式需要按仓库安装指南安装四技能包；普通规划不依赖可选的调度器。
 
-## When to use
+## 核心约定
 
-- A requirement document or issue is the main task carrier.
-- The request is ambiguous, multi-step, cross-file, or changes behavior.
-- New feedback must be merged into an existing plan.
-- The user asks for a Plan, Todo list, implementation approach, or acceptance criteria.
+1. 提出工作方案前，检查当前证据。
+2. 每个需求模块只保留一份当前有效的规划真源。
+3. 明确目标、范围、非目标、假设、验收标准和回滚方式。
+4. 选择方案前，比较可行路径。
+5. 每个实现 Todo 都包含影响分析与验证方式。
+6. 向用户展示 Plan/Todo 后，停下来等待一次确认。
+7. 后续确认授权执行全部列出的 Todo 和验证项，除非触及例外边界。
 
-Do not use for one-line corrections, dependency installation, or read-only diagnosis unless the user explicitly asks for a plan.
+## 适用场景
 
-## Evidence lanes
+- 需求文档或 issue 是任务主载体。
+- 请求存在歧义、包含多个步骤、跨文件或改变行为。
+- 新反馈需要融合进已有计划。
+- 用户要求 Plan、Todo 列表、实现方案或验收标准。
 
-Use only the lanes needed by the task:
+单行修正、安装依赖或只读诊断通常不使用本技能，除非用户明确要求计划。
 
-- Current evidence: requirement files, source, tests, configs, logs, ledgers, and reports.
-- Repository search: existing helpers, patterns, packages, and local tooling.
-- Historical evidence: prior plans, task records, session indexes, or changelogs. Treat history as guidance until current files verify it.
-- External research: current vendor, legal, market, or library facts when the decision depends on them.
+## 证据来源
 
-Record what each lane proved, what was skipped, and why. Never invent missing facts.
+仅使用任务实际需要的证据来源：
 
-## Planning action boundary
+- 当前证据：需求文件、源码、测试、配置、日志、台账和报告。
+- 仓库检索：已有辅助函数、模式、软件包和本地工具。
+- 历史证据：先前计划、任务记录、会话索引或变更日志；当前文件验证前，历史只作参考。
+- 外部调研：决策依赖的最新供应商、法律、市场或软件库事实。
 
-Planning may perform read-only searches, bounded diagnostics, dry runs, local health checks, and temporary probes when they materially improve the plan. Record cleanup and residual risk for any process started.
+记录各来源证明了什么、跳过了什么以及原因。不得编造缺失事实。
 
-Before confirmation, do not edit application behavior, migrate data, publish externally, change permissions, or perform irreversible operations.
+## 规划阶段的操作边界
 
-## Single planning truth
+当确实有助于完善计划时，规划阶段可进行只读搜索、有界诊断、试运行、本地健康检查和临时探测。启动任何进程后，记录清理方式与残余风险。
 
-For a requirement file `feature.md`, prefer:
+确认前不得修改应用行为、迁移数据、对外发布、变更权限或执行不可逆操作。
+
+## 唯一规划真源
+
+以需求文件 `feature.md` 为例，优先采用：
 
 ```text
-feature.md          # requirement truth; read-only unless explicitly authorized
-feature.plan.md     # intent, evidence, approaches, Plan/Todo, validation, rollback
-feature.task.md     # execution and verification evidence after implementation
+feature.md          # 需求真源；未经明确授权保持只读
+feature.plan.md     # 意图、证据、方案、Plan/Todo、验证与回滚
+feature.task.md     # 实现后的执行与验证证据
 ```
 
-Use an `active_module_key` to identify a module. A plan file may contain multiple active modules only when their keys and scopes are distinct. The same key must not have two current executable plans.
+使用 `active_module_key` 标识模块。一个计划文件可包含多个当前模块，但模块的 key 与范围必须各不相同。同一 key 不得存在两份当前可执行计划。
 
-When updating an existing plan:
+更新已有计划时：
 
-1. Create a before snapshot outside the requirement directory when practical.
-2. Find the same key and close aliases.
-3. Classify hits as same module, related but distinct, or unrelated history.
-4. Merge valid same-module content into one current module.
-5. Preserve unrelated historical modules.
-6. Run the preservation guard.
+1. 尽可能在需求目录外创建 before 快照。
+2. 检索相同 key 及近义名称。
+3. 将命中项分类为同一模块、相关但独立模块、无关历史。
+4. 把同模块仍有效内容融合到一个当前模块。
+5. 保留其他无关历史模块。
+6. 运行历史保护校验。
 
-Resolve the directory containing this `SKILL.md`, then run the bundled script from that directory:
+先定位本 `SKILL.md` 所在目录，再从该目录运行附带脚本：
 
 ```bash
 cd /path/to/requirement-to-plan
 python3 scripts/check_plan_preservation.py BEFORE.plan.md AFTER.plan.md
 ```
 
-Do not replace the whole plan or remove substantial history without explicit approval and a rollback source.
+没有明确批准和回滚来源，不得整份替换计划或删除大量历史。确有历史删除授权时，保留校验器要求的 `Plan History Deletion Approval` 或 `plan_history_deletion_approval` 字段，不能自行填写授权。
 
-## Contradiction analysis
+## 矛盾分析（Contradiction analysis）
 
-Every non-trivial plan includes:
+每个非简单计划都包含：
 
-1. Contradictions written as `[A] vs [B]`.
-2. One `main contradiction` and why it dominates.
-3. Nature: adversarial, non-adversarial, or resource constrained.
-4. Response and explicit tradeoff.
-5. A monitor point for a secondary contradiction that may become dominant.
+1. 以 `[A] vs [B]` 表示矛盾。
+2. 指定一个主要矛盾（main contradiction），说明它为何主导当前问题。
+3. 区分性质：对抗性、非对抗性或资源约束。
+4. 写明应对方式与明确取舍。
+5. 为可能上升为主要矛盾的次要矛盾设置监控点。
 
-## Approach exploration
+## 方案探索（Approach exploration）
 
-Compare at least five candidates for non-trivial work:
+非简单任务至少比较五个候选路径：
 
-1. Current-repository/evidence-first.
-2. Existing-solution search.
-3. External research, or `not applicable` with a reason.
-4. Minimal reversible change.
-5. Broader architecture or workflow change.
+1. 当前仓库与证据优先。
+2. 检索已有解决方案。
+3. 外部调研；不适用时写明原因。
+4. 最小可回滚改动。
+5. 较大范围的架构或工作流调整。
 
-For each candidate state correctness, efficiency, complexity, impact, validation, risk, rollback, and decision. Select exactly one primary approach.
+每个候选都说明正确性、效率、复杂度、影响、验证、风险、回滚与决策，最终只选一个主方案。
 
-For performance-sensitive, batch, concurrent, I/O-heavy, model-call, or data-processing work, at least three candidates must be technically distinct implementations.
+性能敏感、批处理、并发、I/O 密集、模型调用或数据处理任务，至少三个候选必须是技术上不同的实现方案。
 
-## Testing and execution routing
+## 测试与执行路由
 
-Every implementation Todo must state:
+每个实现 Todo 必须说明：
 
-- TDD: required, preferred, not applicable, or blocked with reason.
-- Regression scope: focused, contract, E2E, full, skipped, or not applicable.
-- Planned command or evidence artifact.
-- Risk if a gate is skipped.
-- Rollback point.
+- TDD：必需、建议、不适用，或说明阻塞原因。
+- 回归范围：针对性、契约、E2E、全量、跳过或不适用。
+- 计划执行的命令或证据产物。
+- 跳过门禁的风险。
+- 回滚点。
 
-If the environment provides routing or review skills, reference them as optional capabilities. Do not copy their instructions into this skill and do not assume they are installed.
+环境提供路由或审查技能时，将其引用为可选能力。不要复制它们的指令，也不要假定已经安装。
 
-## Parallel work
+## 并行工作
 
-Use parallel workers only for genuinely independent scopes. For every slice record:
+仅对真正独立的范围使用并行执行者。每个任务切片都记录：
 
-- independence and upstream dependency;
-- exact write scope;
-- worker role and output contract;
-- integration owner;
-- verification and rollback.
+- 独立性与上游依赖；
+- 精确写入范围；
+- 执行者角色与输出契约；
+- 集成负责人；
+- 验证方式与回滚点。
 
-Use serial execution for same-file conflicts, unclear contracts, irreversible writes, or tightly coupled changes.
+存在同文件冲突、契约不清、不可逆写入或紧密耦合时，采用串行执行。
 
-## Todo requirements
+## Todo 要求
 
-Every code-changing Todo includes:
+每个改代码的 Todo 都包含：
 
-- User-visible outcome.
-- Dependency.
-- Change block and files/modules.
-- Problem solved.
-- Positive impact.
-- Negative impact and risk.
-- Impact scope.
-- Testing route and regression scope.
-- Parallelization decision.
-- Validation.
-- Rollback.
+- 用户可感知结果。
+- 依赖关系。
+- 变更块及文件或模块。
+- 要解决的问题。
+- 正向影响。
+- 负向影响与风险。
+- 影响范围。
+- 测试路由与回归范围。
+- 并行化决策。
+- 验证方式。
+- 回滚点。
 
-## Confirmation gate
+## 确认门禁（Confirmation gate）
 
-A plan created or materially refreshed in the current assistant turn is not confirmed by the message that requested it. Stop after presenting it. Execution requires a later user message that confirms the visible plan.
+在当前助手轮次创建或实质更新的计划，不视为已被请求生成计划的那条消息确认。展示计划后停止，必须由后续用户消息确认可见计划后才能执行。
 
-After confirmation, do not ask between individual files, Todos, tests, reviews, or evidence updates. Pause again only for:
+确认后，不要在各文件、Todo、测试、审查或证据更新之间重复询问。仅在以下情况再次暂停：
 
-- scope outside the confirmed plan;
-- destructive or irreversible data changes;
-- external publish, send, payment, or permission changes not already approved;
-- production or remote mutation;
-- secrets, significant cost, compliance, or security risk;
-- missing context that blocks safe execution.
+- 超出已确认计划范围；
+- 破坏性或不可逆的数据变更；
+- 未获批准的对外发布、发送、付款或权限变更；
+- 生产环境或远端变更；
+- 涉及密钥、显著费用、合规或安全风险；
+- 缺失上下文，阻止安全执行。
 
-## Output template
+## 输出模板
+
+保留模块前缀和稳定 key，模块内用中文说明。五个候选行必须填写真实比较结论，示例占位不能当作证据或完成结果。
 
 ```markdown
-## User-facing conclusion
-- Decision:
-- Implementation focus:
-- Acceptance:
-- Waiting for confirmation:
-- Non-goals:
+## Module: 需求模块名称
+active_module_key: stable-module-key
 
-## Requirement clarification
-- Goal:
-- Scope:
-- Non-goals:
-- Evidence:
-- Assumptions and gaps:
+### 面向用户的结论
+- 决策：
+- 实现重点：
+- 验收标准：
+- 待确认事项：
+- 非目标：
 
-## Plan
-### Contradiction analysis
-1. Contradictions:
-2. Main contradiction:
-3. Nature:
-4. Response:
-5. Monitor:
+### 需求澄清（Requirement clarification）
+- 目标：
+- 范围：
+- 非目标：
+- 证据：
+- 假设与缺口：
 
-### Approach exploration
-| # | Approach | Decision | Correctness | Efficiency | Complexity | Impact | Validation | Risk / rollback |
+### 计划（Plan）
+#### 矛盾分析（Contradiction analysis）
+1. 矛盾清单：
+2. 主要矛盾：
+3. 性质：
+4. 应对方式：
+5. 监控点：
+
+#### 方案探索（Approach exploration）
+| 序号 | 方案 | 决策 | 正确性 | 效率 | 复杂度 | 影响 | 验证 | 风险与回滚 |
 |---|---|---|---|---|---|---|---|---|
+| 1 | 当前仓库与证据优先 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 |
+| 2 | 已有解决方案检索 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 |
+| 3 | 外部调研或说明不适用 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 |
+| 4 | 最小可回滚改动 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 |
+| 5 | 架构或工作流调整 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 | 待填写 |
 
-### Selected approach
-- Rationale:
-- Files/modules:
-- Source of truth:
-- Testing route:
-- Validation:
-- Risks and rollback:
+#### 最终选择（Selected approach）
+- 选择理由：
+- 文件或模块：
+- 唯一真源：
+- 测试路由：
+- 验证方式：
+- 风险与回滚：
 
-## Todo list
-1. Verb-object title
-   - User-visible outcome:
-   - Dependency:
-   - Change block:
-   - Files/modules:
-   - Positive impact:
-   - Negative impact/risk:
-   - Testing and regression:
-   - Validation:
-   - Rollback:
+### 待办列表（Todo list）
+1. 动词加对象的任务标题
+   - 用户可感知结果：
+   - 依赖关系：
+   - 变更块：
+   - 文件或模块：
+   - 要解决的问题：
+   - 正向影响：
+   - 负向影响与风险：
+   - 影响范围：
+   - 测试与回归：
+   - 并行化决策：
+   - 验证方式：
+   - 回滚点：
 
-## Confirmation gate
-- Waiting for one plan-level confirmation.
+### 确认门禁（Confirmation gate）
+- 等待一次计划级确认。
 ```
 
-## Self-check
+## 自检
 
-Before presenting the plan, verify:
+展示计划前，确认：
 
-- Real files or evidence were inspected.
-- Incremental feedback was merged instead of appended as a second truth.
-- The main requirement remains read-only unless explicitly authorized.
-- Five approaches were considered where required.
-- The five-step contradiction analysis is present.
-- Every implementation Todo includes impact, testing, validation, and rollback.
-- Important skipped checks and residual risk are explicit.
-- The confirmation boundary is visible.
+- 已检查真实文件或证据。
+- 增量反馈已融合，没有追加第二份真源。
+- 未经明确授权，主需求文件保持只读。
+- 需要时已比较五个方案。
+- 包含五步矛盾分析。
+- 每个实现 Todo 都有影响、测试、验证和回滚。
+- 重要的跳过检查与残余风险已明确说明。
+- 确认边界清晰可见。

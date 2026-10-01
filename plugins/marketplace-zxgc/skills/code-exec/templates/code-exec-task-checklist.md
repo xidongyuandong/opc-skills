@@ -1,46 +1,48 @@
-# Code Exec Task Checklist
+# 代码执行任务检查清单
 
-## Reader-first result
+本清单及据此生成的 Markdown 产物默认使用简体中文；必要的关键短语、字段名、接口名、命令、路径和链接可保留英文。
 
-- User-visible outcome:
-- Core judgment:
-- Verification status:
-- Intentionally not done:
-- Rollback point:
+## 面向读者的结果
 
-## Source of truth
+- 用户可感知的结果：
+- 核心判断：
+- 验证状态：
+- 有意未做：
+- 回滚点：
 
-- Requirement / issue / plan:
-- Confirmed Todo:
-- Files expected to change:
-- Files explicitly out of scope:
+## 唯一真源
 
-## Search first
+- 需求、议题或计划：
+- 已确认的待办：
+- 预计修改的文件：
+- 明确不在范围内的文件：
 
-- Repository/code graph query:
-- Existing implementation:
-- Existing tests:
-- Existing tools:
-- External research needed: yes / no, because:
+## 先检索
 
-## Implementation
+- 仓库或代码图谱查询：
+- 已有实现：
+- 已有测试：
+- 已有工具：
+- 是否需要外部调研：是 / 否，原因：
 
-- Execution mode: inline / isolated worktree / parallel slices
-- TDD or regression test:
-- Main risk:
-- Scope expansion detected: yes / no
+## 实现
 
-## Verification
+- 执行方式：当前工作树 / 隔离工作树 / 并行拆分
+- 测试驱动开发或回归测试：
+- 主要风险：
+- 是否发现范围扩大：是 / 否
 
-- Syntax/static:
-- Unit/regression:
-- Contract/integration:
-- E2E/smoke:
-- Build/lint/type/security:
-- Independent review:
+## 验证
 
-## Evidence meaning
+- 语法或静态检查：
+- 单元或回归测试：
+- 合同或集成检查：
+- 端到端或冒烟测试：
+- 构建、代码规范、类型或安全检查：
+- 独立审查：
 
-- What passed checks prove:
-- What they cannot prove:
-- Residual risk:
+## 证据含义
+
+- 通过的检查证明了什么：
+- 它们不能证明什么：
+- 残余风险：
