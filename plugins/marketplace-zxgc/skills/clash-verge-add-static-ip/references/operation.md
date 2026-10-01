@@ -2,7 +2,7 @@
 
 ## 预检与边界
 
-从当前 skill 位置定位相邻核心目录，不使用作者机器路径。检查 Ruby 可运行；Node.js 用于离线执行脚本和回归。GUI 用现场可用的控制工具；没有 GUI 工具时把明确的人工操作交给用户，完成前保持“待 GUI 登记”。
+先完成 [安装前置检查](installation.md)。从当前 skill 位置定位本目录的 scripts 与 assets，不使用作者机器路径。检查 Ruby 可运行；Node.js 用于离线执行脚本和回归。GUI 用现场可用的控制工具；没有 GUI 工具时把明确的人工操作交给用户，完成前保持“待 GUI 登记”。
 
 读取源配置的结构和原卡片类型、显示名称、专属增强绑定；只输出计数、键名和必要显示名称。记录原文件哈希、current、系统代理和 TUN 状态。源文件与合成配置不同：现有 Merge/Script 可能承载必要规则，必须识别后在候选中保留；不能盲目拷贝并共享可写 sidecar。
 
@@ -14,7 +14,7 @@
 
 在私有工作目录用 YAML 序列化库生成 provider/reference YAML，只有所需静态节点；参数至少包含 name/type/server/port 与供应商明确的认证、TLS/UDP 设置。不要拼接 YAML 文本处理含冒号、引号或换行的密码，不将真实值放进命令参数。核心支持协议字段透传，但是否有效由 Mihomo 验证；HTTP/SOCKS5 以外的资料先核验协议，不冒充兼容。
 
-以下是变量化命令示意；由执行 agent 从现场解析绝对路径和名称后填入变量。`core_dir` 是相邻核心目录，`reference_file` 是私有参考文件，`candidate_script` 必须是新的私有输出，名称不允许覆盖源对象。
+以下是变量化命令示意；由执行 agent 从现场解析绝对路径和名称后填入变量。`core_dir` 是当前 `clash-verge-add-static-ip` 目录，`reference_file` 是私有参考文件，`candidate_script` 必须是新的私有输出，名称不允许覆盖源对象。
 
 ```bash
 umask 077
@@ -57,7 +57,7 @@ ruby "$core_dir/scripts/verify_sidecar_profile.rb" \
 3. 通过 GUI 确认卡片可见；只读核验登记 UID 恰好一次、type=local、正式 YAML 存在且结构等同候选；原卡片和 current 保持约定。
 4. Local 是独立快照，更新上游需重新构建；不能承诺订阅更新按钮会维护上游。需要自动更新时使用 Remote 分支并取得有效 URL。
 
-禁止应用运行时直接改 `profiles.yaml` 再退出保存。不要删除未核实引用的临时文件；候选存在不等于注册成功。已有核心旧参考中机器专属同步器、历史地点、宽泛重启建议不适用于此通用入口，不调用作者机器脚本。
+禁止应用运行时直接改 `profiles.yaml` 再退出保存。不要删除未核实引用的临时文件；候选存在不等于注册成功。独立 YAML legacy 流程只供旧调用兼容，不改变此入口保留原规则和不擅自重启的边界。
 
 ## 运行态与失败反馈
 

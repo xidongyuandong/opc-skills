@@ -5,12 +5,21 @@ description: 为 Clash Verge Rev 的现有 VPN 配置新增独立静态 IP 订�
 
 # Clash Verge 新增静态 IP 订阅
 
-完成用户旅程：必要输入 → 识别原订阅 → 构建候选 → GUI 新增独立订阅 → 分层验收。
-本 skill 负责用户流程及授权判断，核心只提供构建算法；若核心旧文档要求逐步重复确认，以用户当前授权和本入口的登记流程为准。相邻 `../clash-verge-static-ip/` 是唯一构建算法依赖，分享时必须携带两个完整目录。先确认依赖存在，读取其 SKILL.md 和本包 [操作流程](references/operation.md)。依赖缺失时明确提示补齐，不能声称已构建或从本机私人目录找代用品。
+完成用户旅程：安装检测/安装与复检 → 必要输入 → 识别原订阅 → 构建候选 → GUI 新增独立订阅 → 分层验收。
+本 skill 自包含：构建器、模板、校验器和测试均随本目录提供，不需要安装另一个 skill。
+先执行 [安装检测与安装流程](references/installation.md)，再进入 [构建与登记](references/operation.md)。
+
+## 第一步：检测 Clash Verge 安装情况
+
+使用本目录 `scripts/check_clash_verge_installation.py`（Python 3.9+，标准库）输出 JSON。
+`installed` 表示找到安装文件证据，仍需核验应用身份、版本和能否打开；`not_found` 只表示常见位置未找到；`unknown` 表示权限、平台或路径证据不足。
+先检测；不能判断时询问用户是否安装及自定义位置，不要直接索要一个不存在的订阅文件。
+确认未安装后，按官方文档选择系统/架构对应的安装方式；普通本机安装在授权范围内执行，管理员授权或安装器交互由用户完成。安装后重新检测并确认应用可打开，再继续。
+不执行任意发现的二进制以读取版本，不把残留配置目录、运行进程或内核 mihomo 当成 GUI 安装证明。
 
 ## 必要输入与缺项提示
 
-先读取用户已提供的信息，只追问缺失项，尽量一次收齐：
+先完成上述安装前置检查，再读取用户已提供的信息，只追问缺失项，尽量一次收齐：
 
 1. **Clash Verge 配置文件绝对路径**。提示：“在 Clash Verge 软件 →【订阅】→ 右键原订阅 →【打开文件】，提供该文件的绝对路径。”必须存在且是可读配置文件，不从旧会话猜当前 UID。
 2. **静态 IP 代理资料**：协议（如 SOCKS5 或 HTTP）、服务器地址、端口、认证方式及账号/密码（若需要）、购买地区、供应商提供的出口 IP（若有）。仅一个 IP 地址不足以建立代理；端口 443 不代表 HTTPS，不能自行猜协议或 TLS。
@@ -45,6 +54,14 @@ description: 为 Clash Verge Rev 的现有 VPN 配置新增独立静态 IP 订�
 
 ## 分享与历史依据
 
-复制本目录及相邻 `clash-verge-static-ip` 到对方 agent 的 skills 目录；按当地平台发现 Clash Verge 的配置目录，不复用其他机器的 UID/index。分享包只含技能源码，不携带任何生成后的候选、参考凭据或真实 VPN 文件。
+只需复制完整 `clash-verge-add-static-ip` 目录到对方 agent 的 skills 目录；按当地平台发现 Clash Verge 的配置目录，不复用其他机器的 UID/index。分享包只含技能源码，不携带任何生成后的候选、参考凭据或真实 VPN 文件。
 
 历史中“静态节点存在但选中 auto-best”“远程更新覆盖手改内容”“运行中改索引被覆盖”等问题及官方链接见 [设计依据](references/design-evidence.md)。这些经验是验证线索，不是对对方当前环境的事实判断。
+
+## 离线自检
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+在本 skill 目录运行；需要 Ruby 和 Node.js。测试会将此目录单独复制到临时位置后运行两套构建回归，不读取真实 VPN。旧名称迁移见 [迁移说明](references/migration.md)。
